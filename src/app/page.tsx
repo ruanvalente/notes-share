@@ -1,8 +1,10 @@
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
-  return (
-    <div>
-      Notes Share
-    </div>
-  );
+	return (
+		<div>
+			<Button>Click me</Button>
+			Notes Share
+		</div>
+	);
 }
