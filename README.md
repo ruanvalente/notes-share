@@ -1,5 +1,8 @@
 # NotesShare
 
+<img width="1906" height="800" alt="Captura de tela de 2025-07-27 19-27-08" src="https://github.com/user-attachments/assets/f1033983-a69e-4834-ac89-cc604ab84283" />
+
+
 NotesShare é uma plataforma para criar, organizar e compartilhar anotações pessoais de forma segura e prática. Mantenha suas ideias privadas ou compartilhe com o mundo através de links únicos. Controle total sobre a privacidade das suas anotações.
 
 ## ✨ Funcionalidades
@@ -50,4 +53,9 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 🙋 Sobre
 
-Feito com ♥ por [Ruan Valente](https://ruanvalente-portfolio.vercel.app/).
+<div align="center">
+	<p>
+		Feito com <span>♥</span> por
+		<a target="_blank" href="https://ruanvalente-portfolio.vercel.app/">Ruan Valente</a>
+	</p>
+</div>
