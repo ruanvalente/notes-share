@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NotesShare
 
-## Getting Started
+NotesShare é uma plataforma para criar, organizar e compartilhar anotações pessoais de forma segura e prática. Mantenha suas ideias privadas ou compartilhe com o mundo através de links únicos. Controle total sobre a privacidade das suas anotações.
 
-First, run the development server:
+## ✨ Funcionalidades
+
+- **Anotações Organizadas:** Crie e organize suas anotações com títulos, tags e busca avançada.
+- **Compartilhamento Fácil:** Compartilhe anotações públicas através de links únicos.
+- **Privacidade Garantida:** Controle total sobre quais anotações são privadas ou públicas.
+- **Interface Moderna:** Layout responsivo e intuitivo, com design limpo e agradável.
+- **Acesso Rápido:** Cadastre-se ou faça login para acessar suas anotações de qualquer lugar.
+
+## 🚀 Tecnologias Utilizadas
+
+- **Next.js**: Framework React para SSR e SSG.
+- **React**: Biblioteca para construção de interfaces.
+- **TypeScript**: Tipagem estática para maior segurança.
+- **Tailwind CSS**: Framework utilitário para estilização rápida.
+- **shadcn/ui**: Componentes acessíveis e customizáveis.
+- **Lucide**: Biblioteca de ícones (ex: FileText, Share2, Lock).
+- **Vercel Fonts (Geist)**: Tipografia moderna e otimizada.
+- **tw-animate-css**: Utilitários de animação para Tailwind.
+- **clsx** e **tailwind-merge**: Utilitários para manipulação de classes CSS.
+
+## 🖥️ Como rodar o projeto
 
 ```bash
+npm install
 npm run dev
-# or
+# ou
+yarn install
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🤝 Como contribuir
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature ou correção (`git checkout -b minha-feature`)
+3. Commit suas alterações (`git commit -m 'feat: minha nova feature'`)
+4. Faça push para a branch (`git push origin minha-feature`)
+5. Abra um Pull Request
 
-## Learn More
+Contribuições são muito bem-vindas!
 
-To learn more about Next.js, take a look at the following resources:
+## 📄 Licença
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🙋 Sobre
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Feito com ♥ por [Ruan Valente](https://ruanvalente-portfolio.vercel.app/).
