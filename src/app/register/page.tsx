@@ -1,8 +1,3 @@
-"use client";
-
-import type React from "react";
-
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,18 +10,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
+import { createUserAction } from "@/actions";
 
-export default function RegisterPage() {
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// TODO: Implementar lógica de cadastro
-		console.log("Register:", { name, email, password, confirmPassword });
-	};
+export default function RegisterPage({
+	searchParams,
+}: {
+	searchParams: { error?: string };
+}) {
+	const errorMessage = searchParams.error
+		? "Erro ao criar conta. Verifique seus dados e tente novamente."
+		: "";
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -44,15 +37,19 @@ export default function RegisterPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSubmit} className="space-y-4">
+					{errorMessage && (
+						<p className="text-red-500 text-sm mb-4 text-center">
+							{errorMessage}
+						</p>
+					)}
+					<form action={createUserAction} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="name">Nome completo</Label>
 							<Input
 								id="name"
+								name="name"
 								type="text"
 								placeholder="Seu nome"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
 								required
 							/>
 						</div>
@@ -61,9 +58,8 @@ export default function RegisterPage() {
 							<Input
 								id="email"
 								type="email"
+								name="email"
 								placeholder="seu@email.com"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
 								required
 							/>
 						</div>
@@ -72,9 +68,8 @@ export default function RegisterPage() {
 							<Input
 								id="password"
 								type="password"
+								name="password"
 								placeholder="••••••••"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
 								required
 							/>
 						</div>
@@ -83,9 +78,8 @@ export default function RegisterPage() {
 							<Input
 								id="confirmPassword"
 								type="password"
+								name="confirmPassword"
 								placeholder="••••••••"
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
 								required
 							/>
 						</div>
