@@ -1,12 +1,17 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, Share2, Lock } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { FileText, Share2, Lock } from "lucide-react";
 
 export default function HomeTemplatePage() {
 	return (
 		<div>
-			<div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-300">
+			<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
 				{/* Header */}
 				<header className="border-b bg-white/80 backdrop-blur-sm">
 					<div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -16,10 +21,12 @@ export default function HomeTemplatePage() {
 						</div>
 						<div className="flex items-center space-x-4">
 							<Link href="/login">
-								<Button variant="ghost">Entrar</Button>
+								<Button className="hover:cursor-pointer" variant="ghost">
+									Entrar
+								</Button>
 							</Link>
 							<Link href="/register">
-								<Button>Cadastrar</Button>
+								<Button className="hover:cursor-pointer">Cadastrar</Button>
 							</Link>
 						</div>
 					</div>
@@ -27,10 +34,12 @@ export default function HomeTemplatePage() {
 
 				{/* Hero Section */}
 				<section className="container mx-auto px-4 py-20 text-center">
-					<h2 className="text-5xl font-bold text-gray-900 mb-6">Suas anotações, organizadas e compartilháveis</h2>
+					<h2 className="text-5xl font-bold text-gray-900 mb-6">
+						Suas anotações, organizadas e compartilháveis
+					</h2>
 					<p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-						Crie, organize e compartilhe suas anotações pessoais de forma segura. Mantenha suas ideias privadas ou
-						compartilhe com o mundo.
+						Crie, organize e compartilhe suas anotações pessoais de forma
+						segura. Mantenha suas ideias privadas ou compartilhe com o mundo.
 					</p>
 					<div className="flex items-center justify-center space-x-4">
 						<Link href="/register">
@@ -39,7 +48,11 @@ export default function HomeTemplatePage() {
 							</Button>
 						</Link>
 						<Link href="/demo">
-							<Button variant="outline" size="lg" className="px-8 bg-transparent hover:cursor-pointer">
+							<Button
+								variant="outline"
+								size="lg"
+								className="px-8 bg-transparent hover:cursor-pointer hover:border-zinc-950 transition-all duration-300"
+							>
 								Ver Demo
 							</Button>
 						</Link>
@@ -53,7 +66,10 @@ export default function HomeTemplatePage() {
 							<CardHeader>
 								<FileText className="h-12 w-12 text-blue-600 mb-4 mx-auto md:mx-0" />
 								<CardTitle>Anotações Organizadas</CardTitle>
-								<CardDescription>Crie e organize suas anotações com títulos, tags e busca avançada</CardDescription>
+								<CardDescription>
+									Crie e organize suas anotações com títulos, tags e busca
+									avançada
+								</CardDescription>
 							</CardHeader>
 						</Card>
 
@@ -61,7 +77,9 @@ export default function HomeTemplatePage() {
 							<CardHeader>
 								<Share2 className="h-12 w-12 text-green-600 mb-4 mx-auto md:mx-0" />
 								<CardTitle>Compartilhamento Fácil</CardTitle>
-								<CardDescription>Compartilhe suas anotações públicas através de links únicos</CardDescription>
+								<CardDescription>
+									Compartilhe suas anotações públicas através de links únicos
+								</CardDescription>
 							</CardHeader>
 						</Card>
 
@@ -69,12 +87,14 @@ export default function HomeTemplatePage() {
 							<CardHeader>
 								<Lock className="h-12 w-12 text-purple-600 mb-4 mx-auto md:mx-0" />
 								<CardTitle>Privacidade Garantida</CardTitle>
-								<CardDescription>Controle total sobre quais anotações são privadas ou públicas</CardDescription>
+								<CardDescription>
+									Controle total sobre quais anotações são privadas ou públicas
+								</CardDescription>
 							</CardHeader>
 						</Card>
 					</div>
 				</section>
 			</div>
 		</div>
-	)
+	);
 }
