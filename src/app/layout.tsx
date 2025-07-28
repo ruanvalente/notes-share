@@ -67,10 +67,7 @@ export default function RootLayout({
 				</main>
 				<footer>
 					<div className="container mx-auto px-4 py-8 text-center text-gray-600">
-						<p>
-							&copy; {new Date().getFullYear()} NotesShare. Todos os direitos
-							reservados.
-						</p>
+						<p>&copy; 2025 NotesShare. Todos os direitos reservados.</p>
 						<p>
 							Feito com <span className="text-red-500">♥</span> por{" "}
 							<Link
