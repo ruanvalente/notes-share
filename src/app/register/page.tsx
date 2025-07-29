@@ -12,15 +12,7 @@ import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
 import { createUserAction } from "@/actions";
 
-export default function RegisterPage({
-	searchParams,
-}: {
-	searchParams: { error?: string };
-}) {
-	const errorMessage = searchParams.error
-		? "Erro ao criar conta. Verifique seus dados e tente novamente."
-		: "";
-
+export default function RegisterPage() {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
 			<Card className="w-full max-w-md">
@@ -37,11 +29,6 @@ export default function RegisterPage({
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					{errorMessage && (
-						<p className="text-red-500 text-sm mb-4 text-center">
-							{errorMessage}
-						</p>
-					)}
 					<form action={createUserAction} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="name">Nome completo</Label>
