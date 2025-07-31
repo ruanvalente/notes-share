@@ -14,11 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
-import { createUserAction } from "@/actions";
+import { createUserAction } from "@/actions/create-user-action";
 
 function RegisterContent() {
 	const searchParams = useSearchParams();
 	const error = searchParams.get("error");
+	const success = searchParams.get("success");
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (formData: FormData) => {
@@ -49,6 +50,11 @@ function RegisterContent() {
 					{error && (
 						<div className="mb-4 text-red-600 text-sm text-center">
 							{decodeURIComponent(error)}
+						</div>
+					)}
+					{success && (
+						<div className="mb-4 text-green-600 text-sm text-center">
+							{decodeURIComponent(success)}
 						</div>
 					)}
 					<form action={handleSubmit} className="space-y-4">
