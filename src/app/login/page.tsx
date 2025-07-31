@@ -1,9 +1,7 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
 import Link from "next/link";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -15,15 +13,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
+import { loginUserAction } from "@/actions/login-user-action";
 
-export default function LoginPage() {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+function LoginContent() {
+	const [error, setError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// TODO: Implementar lógica de login
-		console.log("Login:", { email, password });
+	const handleSubmit = async (formData: FormData) => {
+		setIsLoading(true);
+		setError(null);
+		try {
+			const result = await loginUserAction(formData);
+			if (result?.error) {
+				setError(result.error);
+			}
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -42,15 +48,17 @@ export default function LoginPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSubmit} className="space-y-4">
+					{error && (
+						<div className="mb-4 text-red-600 text-sm text-center">{error}</div>
+					)}
+					<form action={handleSubmit} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="email">Email</Label>
 							<Input
 								id="email"
 								type="email"
+								name="email"
 								placeholder="seu@email.com"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
 								required
 							/>
 						</div>
@@ -59,14 +67,13 @@ export default function LoginPage() {
 							<Input
 								id="password"
 								type="password"
+								name="password"
 								placeholder="••••••••"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
 								required
 							/>
 						</div>
-						<Button type="submit" className="w-full">
-							Entrar
+						<Button type="submit" className="w-full" disabled={isLoading}>
+							{isLoading ? "Entrando..." : "Entrar"}
 						</Button>
 					</form>
 					<div className="mt-6 text-center">
@@ -80,5 +87,13 @@ export default function LoginPage() {
 				</CardContent>
 			</Card>
 		</div>
+	);
+}
+
+export default function LoginPage() {
+	return (
+		<Suspense fallback={<div>Carregando...</div>}>
+			<LoginContent />
+		</Suspense>
 	);
 }

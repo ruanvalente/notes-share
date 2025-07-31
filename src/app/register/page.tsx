@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -12,7 +16,20 @@ import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
 import { createUserAction } from "@/actions";
 
-export default function RegisterPage() {
+function RegisterContent() {
+	const searchParams = useSearchParams();
+	const error = searchParams.get("error");
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleSubmit = async (formData: FormData) => {
+		setIsLoading(true);
+		try {
+			await createUserAction(formData);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
 			<Card className="w-full max-w-md">
@@ -29,7 +46,12 @@ export default function RegisterPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form action={createUserAction} className="space-y-4">
+					{error && (
+						<div className="mb-4 text-red-600 text-sm text-center">
+							{decodeURIComponent(error)}
+						</div>
+					)}
+					<form action={handleSubmit} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="name">Nome completo</Label>
 							<Input
@@ -70,8 +92,8 @@ export default function RegisterPage() {
 								required
 							/>
 						</div>
-						<Button type="submit" className="w-full">
-							Cadastrar
+						<Button type="submit" className="w-full" disabled={isLoading}>
+							{isLoading ? "Cadastrando..." : "Cadastrar"}
 						</Button>
 					</form>
 					<div className="mt-6 text-center">
@@ -85,5 +107,13 @@ export default function RegisterPage() {
 				</CardContent>
 			</Card>
 		</div>
+	);
+}
+
+export default function RegisterPage() {
+	return (
+		<Suspense fallback={<div>Carregando...</div>}>
+			<RegisterContent />
+		</Suspense>
 	);
 }
