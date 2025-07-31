@@ -27,4 +27,6 @@ export const CREATE_USER_ERROR_MESSAGES = {
 	FAILED_CREATE_ACCOUNT: "Erro ao criar a conta. Tente novamente.",
 	GENERIC_ERROR: "Erro inesperado. Tente novamente ou contate o suporte.",
 	REQUIRED_FIELDS: "Preencha todos os campos obrigatórios",
+	CREATE_ACCOUNT_SUCCESS:
+		"Link de confirmação enviado para o seu e-mail! Verifique sua caixa de entrada ou spam.",
 };
