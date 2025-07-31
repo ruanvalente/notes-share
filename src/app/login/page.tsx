@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,17 +13,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
-import { createUserAction } from "@/actions";
+import { loginUserAction } from "@/actions/login-user-action";
 
-function RegisterContent() {
-	const searchParams = useSearchParams();
-	const error = searchParams.get("error");
+function LoginContent() {
+	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (formData: FormData) => {
 		setIsLoading(true);
+		setError(null);
 		try {
-			await createUserAction(formData);
+			const result = await loginUserAction(formData);
+			if (result?.error) {
+				setError(result.error);
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -40,28 +42,16 @@ function RegisterContent() {
 							NotesShare
 						</h1>
 					</div>
-					<CardTitle>Criar nova conta</CardTitle>
+					<CardTitle>Entrar na sua conta</CardTitle>
 					<CardDescription>
-						Cadastre-se para começar a criar suas anotações
+						Digite suas credenciais para acessar suas anotações
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{error && (
-						<div className="mb-4 text-red-600 text-sm text-center">
-							{decodeURIComponent(error)}
-						</div>
+						<div className="mb-4 text-red-600 text-sm text-center">{error}</div>
 					)}
 					<form action={handleSubmit} className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor="name">Nome completo</Label>
-							<Input
-								id="name"
-								name="name"
-								type="text"
-								placeholder="Seu nome"
-								required
-							/>
-						</div>
 						<div className="space-y-2">
 							<Label htmlFor="email">Email</Label>
 							<Input
@@ -82,25 +72,15 @@ function RegisterContent() {
 								required
 							/>
 						</div>
-						<div className="space-y-2">
-							<Label htmlFor="confirmPassword">Confirmar senha</Label>
-							<Input
-								id="confirmPassword"
-								type="password"
-								name="confirmPassword"
-								placeholder="••••••••"
-								required
-							/>
-						</div>
 						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading ? "Cadastrando..." : "Cadastrar"}
+							{isLoading ? "Entrando..." : "Entrar"}
 						</Button>
 					</form>
 					<div className="mt-6 text-center">
 						<p className="text-sm text-gray-600">
-							Já tem uma conta?{" "}
-							<Link href="/login" className="text-blue-600 hover:underline">
-								Entrar
+							Não tem uma conta?{" "}
+							<Link href="/register" className="text-blue-600 hover:underline">
+								Cadastre-se
 							</Link>
 						</p>
 					</div>
@@ -110,10 +90,10 @@ function RegisterContent() {
 	);
 }
 
-export default function RegisterPage() {
+export default function LoginPage() {
 	return (
 		<Suspense fallback={<div>Carregando...</div>}>
-			<RegisterContent />
+			<LoginContent />
 		</Suspense>
 	);
 }
