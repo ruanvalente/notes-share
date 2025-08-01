@@ -6,6 +6,9 @@ import { checkIsValidEmail } from "@/utils/validations";
 import { redirect } from "next/navigation";
 
 export async function resetPasswordAction(formData: FormData) {
+	const supabase = await createClient();
+	const redirectTo = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?type=recovery`;
+
 	const email = (formData.get("email") as string)?.trim();
 
 	if (!checkIsValidEmail(email)) {
@@ -16,12 +19,17 @@ export async function resetPasswordAction(formData: FormData) {
 		);
 	}
 
-	const supabase = await createClient();
+	if (process.env.NODE_ENV === "development") {
+		console.log("Reset Password RedirectTo:", redirectTo);
+	}
 	const { error } = await supabase.auth.resetPasswordForEmail(email, {
-		redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?type=recovery`,
+		redirectTo,
 	});
 
 	if (error) {
+		if (process.env.NODE_ENV === "development") {
+			console.log("Reset Password Error:", error.message);
+		}
 		redirect(`/forgot?error=${encodeURIComponent(error.message)}`);
 	}
 
