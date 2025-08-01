@@ -30,3 +30,14 @@ export const CREATE_USER_ERROR_MESSAGES = {
 	CREATE_ACCOUNT_SUCCESS:
 		"Link de confirmação enviado para o seu e-mail! Verifique sua caixa de entrada ou spam.",
 };
+
+export const RESET_PASSWORD_MESSAGES = {
+	INVALID_EMAIL: "E-mail inválido",
+	EMAIL_NOT_REGISTERED: "Este e-mail não está cadastrado",
+	FAILED_SEND_RESET_LINK:
+		"Erro ao enviar o link de redefinição. Tente novamente.",
+	GENERIC_ERROR: "Erro inesperado. Tente novamente ou contate o suporte.",
+	SUCCESS_RESET_LINK_SENT:
+		"Link de redefinição enviado! Verifique sua caixa de entrada ou spam.",
+	REQUIRED_FIELDS: "O campo de e-mail é obrigatório",
+};

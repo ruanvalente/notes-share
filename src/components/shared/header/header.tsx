@@ -1,4 +1,4 @@
-import { logoutUserAction } from "@/actions/logout-user-action";
+import { logoutUserAction } from "@/actions/auth/logout-user-action";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { FileText, LogOut, User, Menu } from "lucide-react";

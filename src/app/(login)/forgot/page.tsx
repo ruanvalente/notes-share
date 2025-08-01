@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { Suspense, useState } from "react";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -13,20 +13,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
-import { loginUserAction } from "@/actions/login-user-action";
+import { resetPasswordAction } from "@/actions/";
+import Link from "next/link";
 
-function LoginContent() {
-	const [error, setError] = useState<string | null>(null);
+export default function ForgotPasswordPage() {
+	const searchParams = useSearchParams();
+	const error = searchParams.get("error");
+	const success = searchParams.get("success");
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (formData: FormData) => {
 		setIsLoading(true);
-		setError(null);
 		try {
-			const result = await loginUserAction(formData);
-			if (result?.error) {
-				setError(result.error);
-			}
+			await resetPasswordAction(formData);
 		} finally {
 			setIsLoading(false);
 		}
@@ -42,14 +41,21 @@ function LoginContent() {
 							NotesShare
 						</h1>
 					</div>
-					<CardTitle>Entrar na sua conta</CardTitle>
+					<CardTitle>Recuperar Senha</CardTitle>
 					<CardDescription>
-						Digite suas credenciais para acessar suas anotações
+						Insira seu e-mail para receber um link de redefinição de senha.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{error && (
-						<div className="mb-4 text-red-600 text-sm text-center">{error}</div>
+						<div className="mb-4 text-red-600 text-sm text-center">
+							{decodeURIComponent(error)}
+						</div>
+					)}
+					{success && (
+						<div className="mb-4 text-green-600 text-sm text-center">
+							{decodeURIComponent(success)}
+						</div>
 					)}
 					<form action={handleSubmit} className="space-y-4">
 						<div className="space-y-2">
@@ -62,38 +68,20 @@ function LoginContent() {
 								required
 							/>
 						</div>
-						<div className="space-y-2">
-							<Label htmlFor="password">Senha</Label>
-							<Input
-								id="password"
-								type="password"
-								name="password"
-								placeholder="••••••••"
-								required
-							/>
-						</div>
 						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading ? "Entrando..." : "Entrar"}
+							{isLoading ? "Enviando..." : "Enviar Link de Redefinição"}
 						</Button>
 					</form>
 					<div className="mt-6 text-center">
 						<p className="text-sm text-gray-600">
-							Não tem uma conta?{" "}
-							<Link href="/register" className="text-blue-600 hover:underline">
-								Cadastre-se
+							Voltar para{" "}
+							<Link href="/login" className="text-blue-600 hover:underline">
+								Entrar
 							</Link>
 						</p>
 					</div>
 				</CardContent>
 			</Card>
 		</div>
-	);
-}
-
-export default function LoginPage() {
-	return (
-		<Suspense fallback={<div>Carregando...</div>}>
-			<LoginContent />
-		</Suspense>
 	);
 }

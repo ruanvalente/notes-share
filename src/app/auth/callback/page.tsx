@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createSupaseClient } from "@/utils/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
@@ -9,52 +9,82 @@ import { Button } from "@/components/ui/button";
 
 export default function AuthCallback() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [status, setStatus] = useState<"loading" | "success" | "error">(
 		"loading"
 	);
-	const [message, setMessage] = useState("Verificando suas credenciais...");
+	const [message, setMessage] = useState(
+		searchParams.get("type") === "recovery"
+			? "Aguarde, você será redirecionado para definir sua nova senha..."
+			: "Verificando suas credenciais..."
+	);
 	const messageRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const handleCallback = async () => {
 			try {
 				setStatus("loading");
-				setMessage("Verificando suas credenciais...");
+				setMessage(
+					searchParams.get("type") === "recovery"
+						? "Aguarde, você será redirecionado para definir sua nova senha..."
+						: "Verificando suas credenciais..."
+				);
 
 				const supabase = createSupaseClient();
-				const { data, error } = await supabase.auth.getSession();
+				const tokenType = searchParams.get("type");
+				const accessToken = searchParams.get("access_token");
+				const refreshToken = searchParams.get("refresh_token");
 
-				if (error) {
-					setStatus("error");
-					setMessage(
-						error.message.includes("invalid")
-							? "Sessão inválida ou expirada. Redirecionando para login..."
-							: "Erro ao processar autenticação. Redirecionando para login..."
-					);
-					setTimeout(() => {
-						router.push(`/login?error=${encodeURIComponent(error.message)}`);
-					}, 2000);
-					return;
+				if (tokenType !== "recovery") {
+					const {
+						data: { session },
+						error,
+					} = await supabase.auth.getSession();
+					console.log("Session Data:", session);
+					if (error || !session) {
+						if (process.env.NODE_ENV === "development") {
+							console.log(
+								"Session Error:",
+								error?.message || "No session found"
+							);
+						}
+						setStatus("error");
+						setMessage(
+							error?.message.includes("invalid")
+								? "Link inválido ou expirado. Redirecionando para login..."
+								: "Nenhuma sessão ativa encontrada. Redirecionando para login..."
+						);
+						setTimeout(() => {
+							router.push(
+								`/login?error=${encodeURIComponent(
+									error?.message || "Nenhuma sessão ativa encontrada"
+								)}`
+							);
+						}, 2000);
+						return;
+					}
 				}
 
-				if (!data.session) {
-					setStatus("error");
-					setMessage(
-						"Nenhuma sessão ativa encontrada. Redirecionando para login..."
-					);
-					setTimeout(() => {
-						router.push("/login?error=Nenhuma sessão ativa encontrada");
-					}, 2000);
-					return;
-				}
+				const redirectTo =
+					tokenType === "recovery"
+						? `/reset-password${
+								accessToken && refreshToken
+									? `?access_token=${encodeURIComponent(
+											accessToken
+									  )}&refresh_token=${encodeURIComponent(refreshToken)}`
+									: ""
+						  }`
+						: "/dashboard";
 
 				setStatus("success");
 				setMessage("Autenticação realizada com sucesso! Redirecionando...");
 				setTimeout(() => {
-					router.push("/dashboard");
+					router.push(redirectTo);
 				}, 1500);
 			} catch (err) {
-				console.error("Erro ao processar callback de autenticação:", err);
+				if (process.env.NODE_ENV === "development") {
+					console.log("Unexpected Error:", err);
+				}
 				setStatus("error");
 				setMessage("Erro inesperado. Redirecionando para login...");
 				setTimeout(() => {
@@ -64,7 +94,7 @@ export default function AuthCallback() {
 		};
 
 		handleCallback();
-	}, [router]);
+	}, [router, searchParams]);
 
 	useEffect(() => {
 		if (messageRef.current) {
@@ -108,7 +138,6 @@ export default function AuthCallback() {
 			<Card className="w-full max-w-md shadow-lg">
 				<CardContent className="flex flex-col items-center justify-center p-8 space-y-6">
 					<div className="flex items-center justify-center">{getIcon()}</div>
-
 					<div
 						className="text-center space-y-2"
 						role="alert"
@@ -127,7 +156,6 @@ export default function AuthCallback() {
 							{message}
 						</p>
 					</div>
-
 					{status === "loading" && (
 						<div className="w-full bg-gray-200 rounded-full h-2">
 							<div
@@ -136,7 +164,6 @@ export default function AuthCallback() {
 							></div>
 						</div>
 					)}
-
 					<div className="text-center">
 						<p className="text-xs text-gray-500">
 							{status === "loading" && "Por favor, aguarde alguns instantes..."}
