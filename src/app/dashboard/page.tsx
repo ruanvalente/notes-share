@@ -1,10 +1,9 @@
-import { Header } from "@/components/shared/header/header";
-import { NoteCard } from "@/components/shared/note/card/note-card";
-import { EmptyNote } from "@/components/shared/note/empty/empty-note";
+import Link from "next/link";
+import { Plus, Search } from "lucide-react";
+import { Header } from "@/components/shared/header";
+import { EmptyNote, NoteCard } from "@/components/shared/note";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
-import Link from "next/link";
 
 const mockNotes = [
 	{
@@ -34,6 +33,8 @@ const mockNotes = [
 ];
 
 export default function DashboardPage() {
+	const hasNotes = mockNotes && mockNotes.length > 0;
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<Header />
@@ -60,13 +61,15 @@ export default function DashboardPage() {
 					<Input placeholder="Buscar anotações..." className="pl-10 max-w-md" />
 				</div>
 
-				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{mockNotes.map((note) => (
-						<NoteCard key={note.id} note={note} />
-					))}
-				</div>
-
-				<EmptyNote note={mockNotes} />
+				{hasNotes ? (
+					<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+						{mockNotes.map((note) => (
+							<NoteCard key={note.id} note={note} />
+						))}
+					</div>
+				) : (
+					<EmptyNote />
+				)}
 			</section>
 		</div>
 	);
