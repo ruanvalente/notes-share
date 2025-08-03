@@ -1,8 +1,5 @@
-import { logoutUserAction } from "@/actions/logout-user-action";
+import { logoutUserAction } from "@/actions";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabase/server";
-import { FileText, LogOut, User, Menu } from "lucide-react";
-import Link from "next/link";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -10,6 +7,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { createClient } from "@/utils/supabase/server";
+import { FileText, LogOut, Menu, User } from "lucide-react";
+import Link from "next/link";
 
 export async function Header() {
 	const supabase = await createClient();

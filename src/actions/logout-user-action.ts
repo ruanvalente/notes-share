@@ -1,8 +1,8 @@
 "use server";
 
-import { LOGOUT_ERROR_MESSAGES } from "@/utils/constants/messages";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { LOGOUT_ERROR_MESSAGES } from "@/utils/constants/messages";
 
 export async function logoutUserAction(): Promise<void> {
 	const supabase = await createClient();
