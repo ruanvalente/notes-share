@@ -1,61 +1,73 @@
 import { Header } from "@/components/shared/header/header";
+import { NoteCard } from "@/components/shared/note/card/note-card";
+import { EmptyNote } from "@/components/shared/note/empty/empty-note";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+
+const mockNotes = [
+	{
+		id: "1",
+		title: "Ideias para o projeto",
+		content: "Algumas ideias interessantes para implementar no novo projeto...",
+		isPublic: false,
+		createdAt: "2024-01-15",
+		tags: ["trabalho", "ideias"],
+	},
+	{
+		id: "2",
+		title: "Receita de bolo de chocolate",
+		content: "Ingredientes: 2 xícaras de farinha, 1 xícara de açúcar...",
+		isPublic: true,
+		createdAt: "2024-01-14",
+		tags: ["receitas", "doces"],
+	},
+	{
+		id: "3",
+		title: "Lista de livros para ler",
+		content: "1. O Alquimista - Paulo Coelho\n2. 1984 - George Orwell...",
+		isPublic: false,
+		createdAt: "2024-01-13",
+		tags: ["livros", "leitura"],
+	},
+];
 
 export default function DashboardPage() {
 	return (
-		<>
+		<div className="min-h-screen bg-gray-50">
 			<Header />
-			<section className="container mx-auto px-4 py-20 text-center">
-				<h2 className="text-5xl font-bold text-gray-900 mb-6">
-					Bem-vindo ao seu painel de anotações
-				</h2>
-				<p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-					Gerencie suas anotações, organize-as em categorias e compartilhe com
-					seus amigos.
-				</p>
-			</section>
-			<section className="container mx-auto px-4 py-20">
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-					<div className="bg-white shadow-md rounded-lg p-6">
-						<h3 className="text-xl font-semibold text-gray-900 mb-4">
-							Criar Anotação
-						</h3>
-						<p className="text-gray-600 mb-4">
-							Clique aqui para criar uma nova anotação e comece a escrever suas
-							ideias.
+			<section className="container mx-auto px-4 py-8">
+				<div className="flex flex-col items-center justify-between mb-8 md:flex-row">
+					<div>
+						<h1 className="text-3xl font-bold text-gray-900">
+							Minhas Anotações
+						</h1>
+						<p className="text-gray-600 mt-2">
+							Gerencie e organize suas anotações pessoais
 						</p>
-						<Link
-							href="/notes/create"
-							className="text-blue-600 hover:underline"
-						>
-							Criar Anotação
-						</Link>
 					</div>
-					<div className="bg-white shadow-md rounded-lg p-6">
-						<h3 className="text-xl font-semibold text-gray-900 mb-4">
-							Gerenciar Categorias
-						</h3>
-						<p className="text-gray-600 mb-4">
-							Organize suas anotações em categorias para facilitar a busca e o
-							acesso.
-						</p>
-						<Link href="/categories" className="text-blue-600 hover:underline">
-							Gerenciar Categorias
-						</Link>
-					</div>
-					<div className="bg-white shadow-md rounded-lg p-6">
-						<h3 className="text-xl font-semibold text-gray-900 mb-4">
-							Compartilhar Anotações
-						</h3>
-						<p className="text-gray-600 mb-4">
-							Compartilhe suas anotações com amigos ou mantenha-as privadas.
-						</p>
-						<Link href="/notes/share" className="text-blue-600 hover:underline">
-							Compartilhar Anotações
-						</Link>
-					</div>
+					<Link href="/notes/create" className="w-full mt-4 md:w-auto md:mt-0">
+						<Button className="flex items-center space-x-2 w-full md:w-auto">
+							<Plus className="h-4 w-4" />
+							<span>Nova Anotação</span>
+						</Button>
+					</Link>
 				</div>
+
+				<div className="relative mb-8">
+					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+					<Input placeholder="Buscar anotações..." className="pl-10 max-w-md" />
+				</div>
+
+				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{mockNotes.map((note) => (
+						<NoteCard key={note.id} note={note} />
+					))}
+				</div>
+
+				<EmptyNote note={mockNotes} />
 			</section>
-		</>
+		</div>
 	);
 }
