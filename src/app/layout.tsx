@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
-import { PageTransitionWrapper } from "@/components/wrappers/page-transition";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -64,7 +63,7 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				<main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-					<PageTransitionWrapper>{children}</PageTransitionWrapper>
+					{children}
 				</main>
 				<footer>
 					<div className="container mx-auto px-4 py-8 text-center text-gray-600">
@@ -72,6 +71,8 @@ export default function RootLayout({
 						<p>
 							Feito com <span className="text-red-500">♥</span> por{" "}
 							<Link
+								prefetch
+								rel="noopener noreferrer"
 								target="_blank"
 								href="https://ruanvalente-portfolio.vercel.app/"
 								className="text-blue-600 hover:underline"

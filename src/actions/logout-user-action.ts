@@ -11,9 +11,11 @@ export async function logoutUserAction(): Promise<void> {
 	if (error) {
 		console.error(`${LOGOUT_ERROR_MESSAGES.FAILED_LOGOUT}:`, error.message);
 		redirect(
-			`/login?error=${encodeURIComponent(LOGOUT_ERROR_MESSAGES.FAILED_LOGOUT)}`
+			`/auth/login?error=${encodeURIComponent(
+				LOGOUT_ERROR_MESSAGES.FAILED_LOGOUT
+			)}`
 		);
 	}
 
-	redirect("/login");
+	redirect("/auth/login");
 }
