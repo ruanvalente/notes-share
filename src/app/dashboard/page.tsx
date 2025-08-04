@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
-import { Header } from "@/components/shared/header";
 import { EmptyNote, NoteCard } from "@/components/shared/note";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
