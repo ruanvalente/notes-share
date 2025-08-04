@@ -28,7 +28,11 @@ export function NoteCard({ note }: NoteCardProps) {
 			<CardHeader className="pb-3">
 				<div className="flex items-start justify-between">
 					<CardTitle className="text-lg line-clamp-2">
-						<Link href={`/notes/${note.id}`} className="hover:text-blue-600">
+						<Link
+							prefetch
+							href={`/notes/${note.id}`}
+							className="hover:text-blue-600"
+						>
 							{note.title}
 						</Link>
 					</CardTitle>
@@ -36,7 +40,7 @@ export function NoteCard({ note }: NoteCardProps) {
 						{note.isPublic ? (
 							<Globe className="h-4 w-4 text-green-600" />
 						) : (
-							<Lock className="h-4 w-4 text-gray-400" />
+							<Lock className="h-4 w-4 text-red-600" />
 						)}
 					</div>
 				</div>
@@ -74,7 +78,7 @@ export function NoteCard({ note }: NoteCardProps) {
 								<Share2 className="h-3 w-3" />
 							</Button>
 						)}
-						<Link href={`/notes/${note.id}/edit`}>
+						<Link prefetch href={`/notes/${note.id}/edit`}>
 							<Button
 								variant="ghost"
 								size="sm"

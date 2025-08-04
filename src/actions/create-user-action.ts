@@ -19,7 +19,7 @@ export async function createUserAction(formData: FormData) {
 
 	if (!name || !email || !password || !confirmPassword) {
 		redirect(
-			`/register?error=${encodeURIComponent(
+			`/auth/register?error=${encodeURIComponent(
 				CREATE_USER_ERROR_MESSAGES.REQUIRED_FIELDS
 			)}`
 		);
@@ -27,7 +27,7 @@ export async function createUserAction(formData: FormData) {
 
 	if (!checkIsValidEmail(email)) {
 		redirect(
-			`/register?error=${encodeURIComponent(
+			`/auth/register?error=${encodeURIComponent(
 				CREATE_USER_ERROR_MESSAGES.INVALID_EMAIL
 			)}`
 		);
@@ -35,7 +35,7 @@ export async function createUserAction(formData: FormData) {
 
 	if (!checkIsValidPassword(password)) {
 		redirect(
-			`/register?error=${encodeURIComponent(
+			`/auth/register?error=${encodeURIComponent(
 				CREATE_USER_ERROR_MESSAGES.INVALID_PASSWORD
 			)}`
 		);
@@ -47,7 +47,7 @@ export async function createUserAction(formData: FormData) {
 	);
 	if (!arePasswordsMatching) {
 		redirect(
-			`/register?error=${encodeURIComponent(
+			`/auth/register?error=${encodeURIComponent(
 				CREATE_USER_ERROR_MESSAGES.PASSWORDS_NOT_MATCHING
 			)}`
 		);
@@ -56,7 +56,7 @@ export async function createUserAction(formData: FormData) {
 	const isValidName = checkIsValidName(name);
 	if (!isValidName && (name.length < 2 || name.length > 255)) {
 		redirect(
-			`/register?error=${encodeURIComponent(
+			`/auth/register?error=${encodeURIComponent(
 				CREATE_USER_ERROR_MESSAGES.INVALID_NAME
 			)}`
 		);
@@ -81,11 +81,11 @@ export async function createUserAction(formData: FormData) {
 		} else if (signUpError.message.includes("Database error saving new user")) {
 			errorMessage = CREATE_USER_ERROR_MESSAGES.DATABASE_ERROR;
 		}
-		redirect(`/register?error=${encodeURIComponent(errorMessage)}`);
+		redirect(`/auth/register?error=${encodeURIComponent(errorMessage)}`);
 	}
 
 	redirect(
-		`/register?success=${encodeURIComponent(
+		`/auth/register?success=${encodeURIComponent(
 			`${CREATE_USER_ERROR_MESSAGES.CREATE_ACCOUNT_SUCCESS}`
 		)}`
 	);

@@ -19,13 +19,17 @@ export async function GET(request: NextRequest) {
 		} else {
 			const errorMessage = encodeURIComponent(error.message);
 			if (type === "recovery") {
-				return NextResponse.redirect(`${origin}/forgot?error=${errorMessage}`);
+				return NextResponse.redirect(
+					`${origin}/auth/forgot?error=${errorMessage}`
+				);
 			}
-			return NextResponse.redirect(`${origin}/login?error=${errorMessage}`);
+			return NextResponse.redirect(
+				`${origin}/auth/login?error=${errorMessage}`
+			);
 		}
 	}
 
 	return NextResponse.redirect(
-		`${origin}/login?error=${encodeURIComponent("Link inválido")}`
+		`${origin}/auth/login?error=${encodeURIComponent("Link inválido")}`
 	);
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,20 +14,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
-import { loginUserAction } from "@/actions/login-user-action";
+import { createUserAction } from "@/actions/create-user-action";
 
-function LoginContent() {
-	const [error, setError] = useState<string | null>(null);
+function RegisterContent() {
+	const searchParams = useSearchParams();
+	const error = searchParams.get("error");
+	const success = searchParams.get("success");
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleSubmit = async (formData: FormData) => {
 		setIsLoading(true);
-		setError(null);
 		try {
-			const result = await loginUserAction(formData);
-			if (result?.error) {
-				setError(result.error);
-			}
+			await createUserAction(formData);
 		} finally {
 			setIsLoading(false);
 		}
@@ -42,16 +41,33 @@ function LoginContent() {
 							NotesShare
 						</h1>
 					</div>
-					<CardTitle>Entrar na sua conta</CardTitle>
+					<CardTitle>Criar nova conta</CardTitle>
 					<CardDescription>
-						Digite suas credenciais para acessar suas anotações
+						Cadastre-se para começar a criar suas anotações
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{error && (
-						<div className="mb-4 text-red-600 text-sm text-center">{error}</div>
+						<div className="mb-4 text-red-600 text-sm text-center">
+							{decodeURIComponent(error)}
+						</div>
+					)}
+					{success && (
+						<div className="mb-4 text-green-600 text-sm text-center">
+							{decodeURIComponent(success)}
+						</div>
 					)}
 					<form action={handleSubmit} className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="name">Nome completo</Label>
+							<Input
+								id="name"
+								name="name"
+								type="text"
+								placeholder="Seu nome"
+								required
+							/>
+						</div>
 						<div className="space-y-2">
 							<Label htmlFor="email">Email</Label>
 							<Input
@@ -72,15 +88,29 @@ function LoginContent() {
 								required
 							/>
 						</div>
+						<div className="space-y-2">
+							<Label htmlFor="confirmPassword">Confirmar senha</Label>
+							<Input
+								id="confirmPassword"
+								type="password"
+								name="confirmPassword"
+								placeholder="••••••••"
+								required
+							/>
+						</div>
 						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading ? "Entrando..." : "Entrar"}
+							{isLoading ? "Cadastrando..." : "Cadastrar"}
 						</Button>
 					</form>
 					<div className="mt-6 text-center">
 						<p className="text-sm text-gray-600">
-							Não tem uma conta?{" "}
-							<Link href="/register" className="text-blue-600 hover:underline">
-								Cadastre-se
+							Já tem uma conta?{" "}
+							<Link
+								prefetch
+								href="/auth/login"
+								className="text-blue-600 hover:underline"
+							>
+								Entrar
 							</Link>
 						</p>
 					</div>
@@ -90,10 +120,10 @@ function LoginContent() {
 	);
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
 	return (
 		<Suspense fallback={<div>Carregando...</div>}>
-			<LoginContent />
+			<RegisterContent />
 		</Suspense>
 	);
 }

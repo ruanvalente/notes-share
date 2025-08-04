@@ -36,41 +36,40 @@ export default function DashboardPage() {
 	const hasNotes = mockNotes && mockNotes.length > 0;
 
 	return (
-		<div className="min-h-screen bg-gray-50">
-			<Header />
-			<section className="container mx-auto px-4 py-8">
-				<div className="flex flex-col items-center justify-between mb-8 md:flex-row">
-					<div>
-						<h1 className="text-3xl font-bold text-gray-900">
-							Minhas Anotações
-						</h1>
-						<p className="text-gray-600 mt-2">
-							Gerencie e organize suas anotações pessoais
-						</p>
-					</div>
-					<Link href="/notes/create" className="w-full mt-4 md:w-auto md:mt-0">
-						<Button className="flex items-center space-x-2 w-full md:w-auto">
-							<Plus className="h-4 w-4" />
-							<span>Nova Anotação</span>
-						</Button>
-					</Link>
+		<section className="container mx-auto px-4 py-8">
+			<div className="flex flex-col items-center justify-between mb-8 md:flex-row">
+				<div>
+					<h1 className="text-3xl font-bold text-gray-900">Minhas Anotações</h1>
+					<p className="text-gray-600 mt-2">
+						Gerencie e organize suas anotações pessoais
+					</p>
 				</div>
+				<Link
+					prefetch
+					href="/dashboard/notes/create"
+					className="w-full mt-4 md:w-auto md:mt-0"
+				>
+					<Button className="flex items-center space-x-2 w-full md:w-auto hover:cursor-pointer">
+						<Plus className="h-4 w-4" />
+						<span>Nova Anotação</span>
+					</Button>
+				</Link>
+			</div>
 
-				<div className="relative mb-8">
-					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-					<Input placeholder="Buscar anotações..." className="pl-10 max-w-md" />
+			<div className="relative mb-8">
+				<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+				<Input placeholder="Buscar anotações..." className="pl-10 max-w-md" />
+			</div>
+
+			{hasNotes ? (
+				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{mockNotes.map((note) => (
+						<NoteCard key={note.id} note={note} />
+					))}
 				</div>
-
-				{hasNotes ? (
-					<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{mockNotes.map((note) => (
-							<NoteCard key={note.id} note={note} />
-						))}
-					</div>
-				) : (
-					<EmptyNote />
-				)}
-			</section>
-		</div>
+			) : (
+				<EmptyNote />
+			)}
+		</section>
 	);
 }
