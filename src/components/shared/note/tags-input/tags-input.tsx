@@ -1,30 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface TagsInputProps {
+	value?: string[];
 	defaultTags?: string[];
+	onChange?: (tags: string[]) => void;
 }
 
-export function TagsInput({ defaultTags = [] }: TagsInputProps) {
-	const [tags, setTags] = useState<string[]>(defaultTags);
+export function TagsInput({
+	value = [],
+	defaultTags = [],
+	onChange,
+}: TagsInputProps) {
+	const [tags, setTags] = useState<string[]>(
+		value.length > 0 ? value : defaultTags
+	);
 	const [newTag, setNewTag] = useState("");
 
+	useEffect(() => {
+		setTags(value);
+	}, [value]);
+
 	const handleAddTag = () => {
-		if (newTag.trim() && !tags.includes(newTag.trim())) {
-			setTags([...tags, newTag.trim()]);
+		const trimmedTag = newTag.trim();
+		if (trimmedTag && !tags.includes(trimmedTag)) {
+			const updated = [...tags, trimmedTag];
+			setTags(updated);
+			onChange?.(updated);
 			setNewTag("");
 		}
 	};
 
 	const handleRemoveTag = (tagToRemove: string) => {
-		setTags(tags.filter((tag) => tag !== tagToRemove));
+		const updated = tags.filter((tag) => tag !== tagToRemove);
+		setTags(updated);
+		onChange?.(updated);
 	};
+
+	const isAddButtonDisabled = newTag.trim() === "";
 
 	return (
 		<div className="space-y-2">
@@ -34,17 +53,23 @@ export function TagsInput({ defaultTags = [] }: TagsInputProps) {
 					placeholder="Adicionar tag..."
 					value={newTag}
 					onChange={(e) => setNewTag(e.target.value)}
-					onKeyPress={(e) =>
-						e.key === "Enter" && (e.preventDefault(), handleAddTag())
-					}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							e.preventDefault();
+							handleAddTag();
+						}
+					}}
 				/>
-				<Button type="button" onClick={handleAddTag} variant="outline">
+				<Button
+					type="button"
+					onClick={handleAddTag}
+					variant="outline"
+					disabled={isAddButtonDisabled}
+					className={isAddButtonDisabled ? "cursor-not-allowed" : ""}
+				>
 					<Plus className="h-4 w-4" />
 				</Button>
 			</div>
-
-			{/* Hidden input para enviar tags no form */}
-			<input type="hidden" name="tags" value={tags.join(",")} />
 
 			{tags.length > 0 && (
 				<div className="flex flex-wrap gap-2 mt-2">

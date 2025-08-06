@@ -1,39 +1,35 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-import { createNoteAction } from "@/actions/";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useNotes } from "@/hooks/use-notes";
+import { Loader2 } from "lucide-react";
+import { useFormStatus } from "react-dom";
 import { PublicSwitch } from "../public-switch";
 import { TagsInput } from "../tags-input";
 
 export function NoteForm() {
-	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
-	const router = useRouter();
-	const handleCreateNote = async (formData: FormData) => {
-		try {
-			setIsLoading(true);
-			setError(null);
-			const result = await createNoteAction(formData);
-			if (result?.error) {
-				setError(result.error);
-				return;
-			}
-			router.push("/dashboard");
-		} catch (error) {
-			console.log("error", error);
-			setIsLoading(false);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	const {
+		title,
+		content,
+		tags,
+		isPublic,
+		error,
+		formRef,
+		isClearButtonEnabled,
+		setTitle,
+		setContent,
+		setTags,
+		setIsPublic,
+		handleCreateNote,
+		handleClear,
+	} = useNotes();
+	const { pending } = useFormStatus();
+
 	return (
 		<div className="space-y-6">
 			<Card>
@@ -44,15 +40,16 @@ export function NoteForm() {
 						</Alert>
 					)}
 
-					<form action={handleCreateNote} className="space-y-6">
+					<form action={handleCreateNote} className="space-y-6" ref={formRef}>
 						<div className="space-y-2">
 							<Label htmlFor="title">Título *</Label>
 							<Input
 								id="title"
 								name="title"
 								placeholder="Digite o título da sua anotação..."
-								defaultValue={""}
 								required
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
 							/>
 						</div>
 
@@ -62,21 +59,39 @@ export function NoteForm() {
 								id="content"
 								name="content"
 								placeholder="Escreva o conteúdo da sua anotação..."
-								defaultValue={""}
 								rows={12}
 								required
+								value={content}
+								onChange={(e) => setContent(e.target.value)}
 							/>
 						</div>
 
-						<TagsInput defaultTags={[]} />
+						<TagsInput value={tags} onChange={setTags} />
 
-						<PublicSwitch defaultChecked={false} />
+						<PublicSwitch value={isPublic} onChange={setIsPublic} />
 
 						<div className="flex items-center space-x-4 pt-4">
-							<Button disabled={isLoading} type="submit">
-								Salvar Anotação
+							<Button disabled={pending} type="submit">
+								{pending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Salvando sua anotação, aguarde...
+									</>
+								) : (
+									"Salvar Anotação"
+								)}
 							</Button>
-							<Button type="button" variant="outline">
+							<Button
+								type="button"
+								variant="outline"
+								disabled={!isClearButtonEnabled}
+								onClick={handleClear}
+								className={
+									isClearButtonEnabled
+										? "hover:cursor-pointer"
+										: "hover:cursor-not-allowed"
+								}
+							>
 								Limpar
 							</Button>
 						</div>
