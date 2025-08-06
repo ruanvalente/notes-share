@@ -1,5 +1,9 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { ErrorResponseOptions, Note } from "@/utils/types/note-types";
+import {
+	ErrorResponseOptions,
+	Note,
+	SearchOptions,
+} from "@/utils/types/note-types";
 
 function handleError(error: ErrorResponseOptions, operation: string): never {
 	console.error(`Erro na operação ${operation}:`, error);
