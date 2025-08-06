@@ -1,7 +1,7 @@
 "use server";
 
 import { CREATE_USER_ERROR_MESSAGES } from "@/utils/constants/messages";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import {
 	checkArePasswordsMatching,
 	checkIsValidEmail,
@@ -63,7 +63,7 @@ export async function createUserAction(formData: FormData) {
 	}
 
 	const sanitizedName = handleSanitizedName(name);
-	const supabase = await createSupabaseServerClient();
+	const supabase = await createClient();
 
 	const { error: signUpError } = await supabase.auth.signUp({
 		email,

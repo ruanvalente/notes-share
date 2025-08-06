@@ -3,8 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Lock, Globe, Share2, Edit, Trash2 } from "lucide-react";
-import { Note } from "@/utils/types/note-types";
-import { formatDate } from "@/utils/date/format-date";
+
+export type Note = {
+	id: string;
+	title: string;
+	content: string;
+	isPublic: boolean;
+	createdAt: string;
+	tags: string[];
+};
 
 type NoteCardProps = {
 	note: Note;
@@ -30,7 +37,7 @@ export function NoteCard({ note }: NoteCardProps) {
 						</Link>
 					</CardTitle>
 					<div className="flex items-center space-x-1 ml-2">
-						{note.is_public ? (
+						{note.isPublic ? (
 							<Globe className="h-4 w-4 text-green-600" />
 						) : (
 							<Lock className="h-4 w-4 text-red-600" />
@@ -58,11 +65,11 @@ export function NoteCard({ note }: NoteCardProps) {
 				<div className="flex items-center justify-between pt-2 border-t">
 					<div className="flex items-center text-xs text-gray-500">
 						<Calendar className="h-3 w-3 mr-1" />
-						{formatDate(note.created_at as string)}
+						{note.createdAt}
 					</div>
 
 					<div className="flex items-center space-x-1">
-						{note.is_public && (
+						{note.isPublic && (
 							<Button
 								variant="ghost"
 								size="sm"

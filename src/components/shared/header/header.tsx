@@ -7,12 +7,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { FileText, LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
 
 export async function Header() {
-	const supabase = await createSupabaseServerClient();
+	const supabase = await createClient();
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();

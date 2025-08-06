@@ -1,7 +1,7 @@
 "use server";
 
 import { LOGIN_ERROR_MESSAGES } from "@/utils/constants/messages";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { checkIsValidEmail } from "@/utils/validations";
 import { redirect } from "next/navigation";
 
@@ -21,7 +21,7 @@ export async function loginUserAction(formData: FormData) {
 		};
 	}
 
-	const supabase = await createSupabaseServerClient();
+	const supabase = await createClient();
 
 	const { error: signInError } = await supabase.auth.signInWithPassword({
 		email,
