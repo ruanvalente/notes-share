@@ -12,7 +12,7 @@ export function EmptyNote() {
 				Nenhuma anotação encontrada
 			</h3>
 			<p className="text-gray-600 mb-4">Comece criando sua primeira anotação</p>
-			<Link href="/notes/create" prefetch>
+			<Link href="/dashboard/notes/create" prefetch>
 				<Button className="cursor-pointer">Criar primeira anotação</Button>
 			</Link>
 		</div>
