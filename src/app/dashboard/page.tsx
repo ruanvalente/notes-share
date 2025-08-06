@@ -21,11 +21,11 @@ export default async function DashboardPage() {
 				<Link
 					prefetch
 					href="/dashboard/notes/create"
-					className="w-full mt-4 md:w-auto md:mt-0"
+					className="w-full mt-4 md:w-auto md:mt-0 flex justify-end"
 				>
-					<Button className="flex items-center space-x-2 w-full md:w-auto hover:cursor-pointer">
+					<Button className="flex items-center justify-center md:space-x-2 w-fit md:w-auto hover:cursor-pointer rounded-full md:rounded-md">
 						<Plus className="h-4 w-4" />
-						<span>Nova Anotação</span>
+						<span className="hidden md:inline">Nova Anotação</span>
 					</Button>
 				</Link>
 			</div>
