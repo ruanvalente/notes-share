@@ -76,7 +76,7 @@ export async function updateNoteAction(id: string, formData: FormData) {
 
 		const updatedNote = await updateNoteDb(id, noteData);
 
-		revalidatePath("/");
+		revalidatePath("/dashboard");
 
 		return {
 			success: true,
@@ -97,7 +97,7 @@ export async function deleteNoteAction(formData: FormData): Promise<void> {
 	try {
 		const id = formData.get("id") as string;
 		await deleteNoteDb(id);
-		revalidatePath("/");
+		revalidatePath("/dashboard");
 	} catch (error) {
 		throw new Error(
 			error instanceof Error
