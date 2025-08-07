@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 				);
 			}
 			return NextResponse.redirect(
-				`${origin}/auth/login?error=${errorMessage}`
+				`${origin}/auth/fallback?error=${errorMessage}`
 			);
 		}
 	}
