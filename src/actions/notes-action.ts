@@ -9,11 +9,11 @@ import {
 } from "@/service/notes-service";
 import { SearchOptions } from "@/utils/types/note-types";
 
-type ActionResult = {
-	success: boolean;
-	error?: string;
-	data?: unknown;
-};
+// type ActionResult = {
+// 	success: boolean;
+// 	error?: string;
+// 	data?: unknown;
+// };
 
 export async function createNoteAction(formData: FormData) {
 	try {
