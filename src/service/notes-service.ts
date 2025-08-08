@@ -1,30 +1,18 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-	ErrorResponseOptions,
-	Note,
-	SearchOptions,
-} from "@/utils/types/note-types";
-
-function handleError(error: ErrorResponseOptions, operation: string): never {
-	console.error(`Erro na operação ${operation}:`, error);
-
-	let errorMessage = `Erro ao ${operation}. `;
-
-	if (error?.message) {
-		errorMessage += error.message;
-	} else if (error?.error_description) {
-		errorMessage += error.error_description;
-	} else {
-		errorMessage += "Tente novamente mais tarde.";
-	}
-
-	throw new Error(errorMessage);
-}
+import { handleError } from "@/utils/erros/error-handler";
+import { Note, SearchOptions } from "@/utils/types/note-types";
 
 async function createNote(
 	noteData: Omit<Note, "id" | "created_at" | "updated_at">
 ): Promise<Note> {
 	const supabase = await createSupabaseServerClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		throw new Error("Usuário não autenticado");
+	}
 
 	if (!noteData.title.trim()) {
 		throw new Error("Título é obrigatório");
@@ -43,6 +31,7 @@ async function createNote(
 					content: noteData.content.trim(),
 					is_public: noteData.is_public,
 					tags: noteData.tags.filter((tag) => tag.trim() !== ""),
+					user_id: user.id,
 				},
 			])
 			.select()
@@ -63,6 +52,13 @@ async function updateNote(
 	noteData: Partial<Omit<Note, "id" | "created_at" | "updated_at">>
 ): Promise<Note> {
 	const supabase = await createSupabaseServerClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		throw new Error("Usuário não autenticado");
+	}
 
 	if (!id) {
 		throw new Error("ID da nota é obrigatório");
@@ -97,6 +93,7 @@ async function updateNote(
 			.from("notes")
 			.update(updateData)
 			.eq("id", id)
+			.eq("user_id", user.id)
 			.select()
 			.single();
 
@@ -112,13 +109,24 @@ async function updateNote(
 
 async function deleteNote(id: string): Promise<boolean> {
 	const supabase = await createSupabaseServerClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		throw new Error("Usuário não autenticado");
+	}
 
 	if (!id) {
 		throw new Error("ID da nota é obrigatório");
 	}
 
 	try {
-		const { error } = await supabase.from("notes").delete().eq("id", id);
+		const { error } = await supabase
+			.from("notes")
+			.delete()
+			.eq("id", id)
+			.eq("user_id", user.id);
 
 		if (error) {
 			handleError(error, "excluir nota");
@@ -159,11 +167,19 @@ async function getNoteById(id: string): Promise<Note | null> {
 
 async function getAllNotes(): Promise<Note[]> {
 	const supabase = await createSupabaseServerClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		throw new Error("Usuário não autenticado");
+	}
 
 	try {
 		const { data, error } = await supabase
 			.from("notes")
 			.select("*")
+			.eq("user_id", user.id)
 			.order("created_at", { ascending: false });
 
 		if (error) {
@@ -181,6 +197,13 @@ async function searchNotes(
 	options: SearchOptions = {}
 ): Promise<Note[]> {
 	const supabase = await createSupabaseServerClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		throw new Error("Usuário não autenticado");
+	}
 
 	if (!query.trim()) {
 		throw new Error("Termo de pesquisa é obrigatório");
@@ -195,7 +218,10 @@ async function searchNotes(
 	} = options;
 
 	try {
-		let queryBuilder = supabase.from("notes").select("*");
+		let queryBuilder = supabase
+			.from("notes")
+			.select("*")
+			.eq("user_id", user.id);
 
 		const searchConditions: string[] = [];
 

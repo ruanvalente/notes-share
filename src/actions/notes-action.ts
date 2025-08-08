@@ -1,21 +1,24 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
-	createNote as createNoteDb,
-	updateNote as updateNoteDb,
-	deleteNote as deleteNoteDb,
-	searchNotes as searchNotesDb,
+	createNote,
+	updateNote,
+	deleteNote,
+	searchNotes,
 } from "@/service/notes-service";
 import { SearchOptions } from "@/utils/types/note-types";
 
-// type ActionResult = {
-// 	success: boolean;
-// 	error?: string;
-// 	data?: unknown;
-// };
+interface ActionResult {
+	success: boolean;
+	error?: string;
+	data?: unknown;
+}
 
-export async function createNoteAction(formData: FormData) {
+export async function createNoteAction(
+	formData: FormData
+): Promise<ActionResult> {
 	try {
 		const title = formData.get("title") as string;
 		const content = formData.get("content") as string;
@@ -35,7 +38,7 @@ export async function createNoteAction(formData: FormData) {
 			tags,
 		};
 
-		const newNote = await createNoteDb(noteData);
+		const newNote = await createNote(noteData);
 
 		revalidatePath("/dashboard");
 
@@ -54,7 +57,10 @@ export async function createNoteAction(formData: FormData) {
 	}
 }
 
-export async function updateNoteAction(id: string, formData: FormData) {
+export async function updateNoteAction(
+	id: string,
+	formData: FormData
+): Promise<ActionResult> {
 	try {
 		const title = formData.get("title") as string;
 		const content = formData.get("content") as string;
@@ -74,7 +80,7 @@ export async function updateNoteAction(id: string, formData: FormData) {
 			tags,
 		};
 
-		const updatedNote = await updateNoteDb(id, noteData);
+		const updatedNote = await updateNote(id, noteData);
 
 		revalidatePath("/dashboard");
 
@@ -93,26 +99,31 @@ export async function updateNoteAction(id: string, formData: FormData) {
 	}
 }
 
-export async function deleteNoteAction(formData: FormData): Promise<void> {
+export async function deleteNoteAction(id: string): Promise<ActionResult> {
 	try {
-		const id = formData.get("id") as string;
-		await deleteNoteDb(id);
-		revalidatePath("/dashboard");
+		const success = await deleteNote(id);
+		if (success) {
+			revalidatePath("/dashboard");
+			return { success: true };
+		}
+		return { success: false, error: "Falha ao excluir a nota" };
 	} catch (error) {
-		throw new Error(
-			error instanceof Error
-				? error.message
-				: "Erro desconhecido ao excluir nota"
-		);
+		return {
+			success: false,
+			error:
+				error instanceof Error
+					? error.message
+					: "Erro desconhecido ao excluir nota",
+		};
 	}
 }
 
 export async function searchNotesAction(
 	query: string,
 	options?: SearchOptions
-) {
+): Promise<ActionResult> {
 	try {
-		const results = await searchNotesDb(query, options);
+		const results = await searchNotes(query, options);
 
 		return {
 			success: true,
@@ -130,8 +141,6 @@ export async function searchNotesAction(
 }
 
 export async function searchNotesFormAction(formData: FormData): Promise<void> {
-	const { redirect } = await import("next/navigation");
-
 	try {
 		const query = formData.get("query") as string;
 

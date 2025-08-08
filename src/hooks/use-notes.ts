@@ -1,8 +1,9 @@
 "use client";
 
-import { createNoteAction } from "@/actions/";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
+import { createNoteAction, deleteNoteAction } from "@/actions";
+import { useToast } from "@/hooks/use-toast";
 
 export function useNotes() {
 	const [title, setTitle] = useState("");
@@ -10,28 +11,32 @@ export function useNotes() {
 	const [tags, setTags] = useState<string[]>([]);
 	const [isPublic, setIsPublic] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [isPending, startTransition] = useTransition();
 	const formRef = useRef<HTMLFormElement>(null);
 	const router = useRouter();
+	const { toastSuccess, toastError } = useToast();
 
 	const isClearButtonEnabled =
 		title.trim() !== "" || content.trim() !== "" || tags.length > 0;
 
-	const handleCreateNote = async (formData: FormData) => {
-		try {
-			setError(null);
+	const handleCreateNote = (formData: FormData, onSuccess?: () => void) => {
+		startTransition(async () => {
 			formData.append("tags", tags.join(","));
 			formData.append("isPublic", isPublic.toString());
 
 			const result = await createNoteAction(formData);
-			if (result?.error) {
-				setError(result.error);
-				return;
+
+			if (result.success) {
+				toastSuccess("Nota criada com sucesso");
+				router.push("/dashboard"); // ou router.refresh() se quiser recarregar no mesmo local
+				if (onSuccess) onSuccess();
+			} else {
+				toastError("Não foi possível criar a nota", {
+					description: result.error || "Erro ao criar nota",
+				});
+				if (onSuccess) onSuccess();
 			}
-			router.push("/dashboard");
-		} catch (error) {
-			console.log("error", error);
-			setError("Erro inesperado ao salvar a anotação.");
-		}
+		});
 	};
 
 	const handleClear = () => {
@@ -42,6 +47,23 @@ export function useNotes() {
 		if (formRef.current) {
 			formRef.current.reset();
 		}
+	};
+
+	const handleDeleteNote = (id: string, onSuccess?: () => void) => {
+		startTransition(async () => {
+			const result = await deleteNoteAction(id);
+			if (result.success) {
+				toastSuccess("Nota excluída com sucesso");
+				router.refresh();
+				if (onSuccess) onSuccess();
+			} else {
+				toastError("Não foi possível criar a nota", {
+					description: result.error || "Erro ao criar nota",
+				});
+				setError(result.error as string);
+				if (onSuccess) onSuccess();
+			}
+		});
 	};
 
 	return {
@@ -58,5 +80,7 @@ export function useNotes() {
 		setIsPublic,
 		handleCreateNote,
 		handleClear,
+		handleDeleteNote,
+		isPending,
 	};
 }
