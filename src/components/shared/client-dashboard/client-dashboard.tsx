@@ -39,6 +39,7 @@ function NotesList() {
 }
 
 export function ClientDashboard({ notes }: ClientDashboardTypeProps) {
+	// TODO: adjust search note
 	const { searchTerm, setSearchTerm, setNotes } = useNotes();
 
 	useEffect(() => {
