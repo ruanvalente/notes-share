@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { useState, useTransition } from "react";
+import { FileText, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -12,24 +14,37 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText } from "lucide-react";
+
 import { loginUserAction } from "@/actions/login-user-action";
+import { useToast } from "@/hooks/use-toast";
 
-function LoginContent() {
+export default function LoginContent() {
 	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
-
-	const handleSubmit = async (formData: FormData) => {
-		setIsLoading(true);
+	const [isPending, startTransition] = useTransition();
+	const { toastError } = useToast();
+	const fields = [
+		{
+			id: "email",
+			label: "Email",
+			type: "email",
+			placeholder: "seu@email.com",
+		},
+		{
+			id: "password",
+			label: "Senha",
+			type: "password",
+			placeholder: "••••••••",
+		},
+	];
+	const handleSignIn = async (formData: FormData) => {
 		setError(null);
-		try {
+		startTransition(async () => {
 			const result = await loginUserAction(formData);
 			if (result?.error) {
 				setError(result.error);
+				toastError(result.error);
 			}
-		} finally {
-			setIsLoading(false);
-		}
+		});
 	};
 
 	return (
@@ -47,35 +62,34 @@ function LoginContent() {
 						Digite suas credenciais para acessar suas anotações
 					</CardDescription>
 				</CardHeader>
+
 				<CardContent>
 					{error && (
 						<div className="mb-4 text-red-600 text-sm text-center">{error}</div>
 					)}
-					<form action={handleSubmit} className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
-							<Input
-								id="email"
-								type="email"
-								name="email"
-								placeholder="seu@email.com"
-								required
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="password">Senha</Label>
-							<Input
-								id="password"
-								type="password"
-								name="password"
-								placeholder="••••••••"
-								required
-							/>
-						</div>
-						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading ? "Entrando..." : "Entrar"}
+
+					<form action={handleSignIn} className="space-y-4">
+						{fields.map(({ id, label, type, placeholder }) => (
+							<div key={id} className="space-y-2">
+								<Label htmlFor={id}>{label}</Label>
+								<Input
+									id={id}
+									name={id}
+									type={type}
+									placeholder={placeholder}
+									required
+								/>
+							</div>
+						))}
+
+						<Button type="submit" className="w-full" disabled={isPending}>
+							<span className="flex items-center justify-center gap-2">
+								{isPending && <Loader2 className="animate-spin w-4 h-4" />}
+								{isPending ? "Entrando..." : "Entrar"}
+							</span>
 						</Button>
 					</form>
+
 					<div className="mt-6 text-center">
 						<p className="text-sm text-gray-600">
 							Não tem uma conta?{" "}
@@ -91,13 +105,5 @@ function LoginContent() {
 				</CardContent>
 			</Card>
 		</div>
-	);
-}
-
-export default function LoginPage() {
-	return (
-		<Suspense fallback={<div>Carregando...</div>}>
-			<LoginContent />
-		</Suspense>
 	);
 }

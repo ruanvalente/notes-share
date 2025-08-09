@@ -11,7 +11,6 @@ export default function CreateNotePage() {
 							Crie uma nova anotação e organize suas ideias
 						</p>
 					</div>
-
 					<NoteForm />
 				</div>
 			</main>
