@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { createUserAction } from "@/actions/create-user-action";
 import { useToast } from "@/hooks/use-toast";
 
-export function RegisterContent() {
+export default function RegisterContent() {
 	const searchParams = useSearchParams();
 	const error = searchParams.get("error");
 	const success = searchParams.get("success");
