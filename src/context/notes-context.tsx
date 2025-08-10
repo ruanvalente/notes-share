@@ -75,8 +75,13 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 	const filteredNotes = useMemo(() => {
 		if (!debouncedTerm.trim()) return state.notes;
 
-		return state.notes.filter((note) =>
-			note.title.toLowerCase().includes(debouncedTerm.toLowerCase())
+		const lowerTerm = debouncedTerm.toLowerCase();
+
+		return state.notes.filter(
+			(note) =>
+				note.title.toLowerCase().includes(lowerTerm) ||
+				note.content.toLowerCase().includes(lowerTerm) ||
+				note.tags.some((tag) => tag.toLowerCase().includes(lowerTerm))
 		);
 	}, [state.notes, debouncedTerm]);
 
@@ -184,6 +189,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 				formRef,
 				isClearButtonEnabled,
 				filteredNotes,
+				debouncedTerm,
 				setTitle,
 				setContent,
 				setTags,
