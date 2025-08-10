@@ -1,26 +1,29 @@
 "use client";
 
+import { FormEvent } from "react";
+import { useFormStatus } from "react-dom";
+import { Loader2 } from "lucide-react";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useNotes } from "@/hooks/use-notes";
-import { Loader2 } from "lucide-react";
-import { useFormStatus } from "react-dom";
+
 import { PublicSwitch } from "../public-switch";
 import { TagsInput } from "../tags-input";
+import { useNotes } from "@/context";
 
 export function NoteForm() {
 	const {
 		title,
+		formRef,
 		content,
 		tags,
 		isPublic,
-		error,
-		formRef,
 		isClearButtonEnabled,
+		error,
 		setTitle,
 		setContent,
 		setTags,
@@ -28,7 +31,15 @@ export function NoteForm() {
 		handleCreateNote,
 		handleClear,
 	} = useNotes();
+
 	const { pending } = useFormStatus();
+
+	const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		if (!formRef.current) return;
+		const formData = new FormData(formRef.current);
+		await handleCreateNote(formData);
+	};
 
 	return (
 		<div className="space-y-6">
@@ -40,7 +51,7 @@ export function NoteForm() {
 						</Alert>
 					)}
 
-					<form action={handleCreateNote} className="space-y-6" ref={formRef}>
+					<form onSubmit={onSubmit} className="space-y-6" ref={formRef}>
 						<div className="space-y-2">
 							<Label htmlFor="title">Título *</Label>
 							<Input

@@ -16,7 +16,7 @@ import {
 import { Calendar, Lock, Globe, Share2, Edit, Trash2 } from "lucide-react";
 import { Note } from "@/utils/types/note-types";
 import { formatDate } from "@/utils/date/format-date";
-import { useNotes } from "@/hooks/use-notes";
+import { useNotes } from "@/context";
 
 type NoteCardProps = {
 	note: Note;

@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { NotesProvider } from "@/context";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -64,7 +65,7 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				<main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-					{children}
+					<NotesProvider>{children}</NotesProvider>
 				</main>
 				<footer>
 					<div className="container mx-auto px-4 py-8 text-center text-gray-600">

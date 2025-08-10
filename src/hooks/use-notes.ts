@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition, useCallback } from "react";
 import { createNoteAction, deleteNoteAction } from "@/actions";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,27 +19,44 @@ export function useNotes() {
 	const isClearButtonEnabled =
 		title.trim() !== "" || content.trim() !== "" || tags.length > 0;
 
-	const handleCreateNote = (formData: FormData, onSuccess?: () => void) => {
-		startTransition(async () => {
-			formData.append("tags", tags.join(","));
-			formData.append("isPublic", isPublic.toString());
+	const handleError = useCallback(
+		(errorMessage: string | undefined, onSuccess?: () => void) => {
+			toastError("Ocorreu um erro", {
+				description: errorMessage || "Erro inesperado",
+			});
+			setError(errorMessage || "Erro inesperado");
+			if (onSuccess) onSuccess();
+		},
+		[toastError]
+	);
 
-			const result = await createNoteAction(formData);
+	const handleCreateNote = useCallback(
+		(formData: FormData, onSuccess?: () => void) => {
+			startTransition(() => {
+				(async () => {
+					try {
+						formData.append("tags", tags.join(","));
+						formData.append("isPublic", isPublic.toString());
 
-			if (result.success) {
-				toastSuccess("Nota criada com sucesso");
-				router.push("/dashboard"); // ou router.refresh() se quiser recarregar no mesmo local
-				if (onSuccess) onSuccess();
-			} else {
-				toastError("Não foi possível criar a nota", {
-					description: result.error || "Erro ao criar nota",
-				});
-				if (onSuccess) onSuccess();
-			}
-		});
-	};
+						const result = await createNoteAction(formData);
 
-	const handleClear = () => {
+						if (result.success) {
+							toastSuccess("Nota criada com sucesso");
+							router.push("/dashboard");
+							if (onSuccess) onSuccess();
+						} else {
+							handleError(result.error, onSuccess);
+						}
+					} catch (err) {
+						handleError((err as Error).message, onSuccess);
+					}
+				})();
+			});
+		},
+		[tags, isPublic, router, toastSuccess, handleError]
+	);
+
+	const handleClear = useCallback(() => {
 		setTitle("");
 		setContent("");
 		setTags([]);
@@ -47,24 +64,29 @@ export function useNotes() {
 		if (formRef.current) {
 			formRef.current.reset();
 		}
-	};
+	}, []);
 
-	const handleDeleteNote = (id: string, onSuccess?: () => void) => {
-		startTransition(async () => {
-			const result = await deleteNoteAction(id);
-			if (result.success) {
-				toastSuccess("Nota excluída com sucesso");
-				router.refresh();
-				if (onSuccess) onSuccess();
-			} else {
-				toastError("Não foi possível criar a nota", {
-					description: result.error || "Erro ao criar nota",
-				});
-				setError(result.error as string);
-				if (onSuccess) onSuccess();
-			}
-		});
-	};
+	const handleDeleteNote = useCallback(
+		(id: string, onSuccess?: () => void) => {
+			startTransition(() => {
+				(async () => {
+					try {
+						const result = await deleteNoteAction(id);
+						if (result.success) {
+							toastSuccess("Nota excluída com sucesso");
+							router.refresh();
+							if (onSuccess) onSuccess();
+						} else {
+							handleError(result.error, onSuccess);
+						}
+					} catch (err) {
+						handleError((err as Error).message, onSuccess);
+					}
+				})();
+			});
+		},
+		[router, toastSuccess, handleError]
+	);
 
 	return {
 		title,
@@ -74,6 +96,7 @@ export function useNotes() {
 		error,
 		formRef,
 		isClearButtonEnabled,
+		isPending,
 		setTitle,
 		setContent,
 		setTags,
@@ -81,6 +104,5 @@ export function useNotes() {
 		handleCreateNote,
 		handleClear,
 		handleDeleteNote,
-		isPending,
 	};
 }

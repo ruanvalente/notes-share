@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { useEffect, useTransition, useCallback } from "react";
+import { FileText, Loader2Icon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -13,23 +15,64 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText } from "lucide-react";
-import { createUserAction } from "@/actions/create-user-action";
 
-function RegisterContent() {
+import { createUserAction } from "@/actions/create-user-action";
+import { useToast } from "@/hooks/use-toast";
+
+export default function RegisterContent() {
 	const searchParams = useSearchParams();
 	const error = searchParams.get("error");
 	const success = searchParams.get("success");
-	const [isLoading, setIsLoading] = useState(false);
+	const formFields = [
+		{
+			id: "name",
+			label: "Nome completo",
+			type: "text",
+			placeholder: "Seu nome",
+		},
+		{
+			id: "email",
+			label: "Email",
+			type: "email",
+			placeholder: "seu@email.com",
+		},
+		{
+			id: "password",
+			label: "Senha",
+			type: "password",
+			placeholder: "••••••••",
+		},
+		{
+			id: "confirmPassword",
+			label: "Confirmar senha",
+			type: "password",
+			placeholder: "••••••••",
+		},
+	];
+	const [isPending, startTransition] = useTransition();
+	const { toastError, toastSuccess } = useToast();
 
-	const handleSubmit = async (formData: FormData) => {
-		setIsLoading(true);
-		try {
-			await createUserAction(formData);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	useEffect(() => {
+		if (success) toastSuccess(decodeURIComponent(success));
+		if (error) toastError(decodeURIComponent(error));
+	}, [success, error, toastSuccess, toastError]);
+
+	const handleRegisterUser = useCallback((formData: FormData) => {
+		startTransition(() => {
+			createUserAction(formData);
+		});
+	}, []);
+
+	const renderMessage = (message: string | null, type: "error" | "success") =>
+		message && (
+			<div
+				className={`mb-4 text-sm text-center ${
+					type === "error" ? "text-red-600" : "text-green-600"
+				}`}
+			>
+				{decodeURIComponent(message)}
+			</div>
+		);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -47,61 +90,31 @@ function RegisterContent() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					{error && (
-						<div className="mb-4 text-red-600 text-sm text-center">
-							{decodeURIComponent(error)}
-						</div>
-					)}
-					{success && (
-						<div className="mb-4 text-green-600 text-sm text-center">
-							{decodeURIComponent(success)}
-						</div>
-					)}
-					<form action={handleSubmit} className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor="name">Nome completo</Label>
-							<Input
-								id="name"
-								name="name"
-								type="text"
-								placeholder="Seu nome"
-								required
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
-							<Input
-								id="email"
-								type="email"
-								name="email"
-								placeholder="seu@email.com"
-								required
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="password">Senha</Label>
-							<Input
-								id="password"
-								type="password"
-								name="password"
-								placeholder="••••••••"
-								required
-							/>
-						</div>
-						<div className="space-y-2">
-							<Label htmlFor="confirmPassword">Confirmar senha</Label>
-							<Input
-								id="confirmPassword"
-								type="password"
-								name="confirmPassword"
-								placeholder="••••••••"
-								required
-							/>
-						</div>
-						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading ? "Cadastrando..." : "Cadastrar"}
+					{renderMessage(error, "error")}
+					{renderMessage(success, "success")}
+
+					<form action={handleRegisterUser} className="space-y-4">
+						{formFields.map(({ id, label, type, placeholder }) => (
+							<div key={id} className="space-y-2">
+								<Label htmlFor={id}>{label}</Label>
+								<Input
+									id={id}
+									name={id}
+									type={type}
+									placeholder={placeholder}
+									required
+								/>
+							</div>
+						))}
+
+						<Button type="submit" className="w-full" disabled={isPending}>
+							<span className="flex items-center justify-center gap-2">
+								{isPending && <Loader2Icon className="animate-spin" />}
+								<span>{isPending ? "Cadastrando..." : "Cadastrar"}</span>
+							</span>
 						</Button>
 					</form>
+
 					<div className="mt-6 text-center">
 						<p className="text-sm text-gray-600">
 							Já tem uma conta?{" "}
@@ -117,13 +130,5 @@ function RegisterContent() {
 				</CardContent>
 			</Card>
 		</div>
-	);
-}
-
-export default function RegisterPage() {
-	return (
-		<Suspense fallback={<div>Carregando...</div>}>
-			<RegisterContent />
-		</Suspense>
 	);
 }
