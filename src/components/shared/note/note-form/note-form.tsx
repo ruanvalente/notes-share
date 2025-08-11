@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState, useCallback } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -9,14 +9,16 @@ import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-import { Note } from "@/utils/types/note-types";
-import { PublicSwitch } from "../public-switch";
-import { TagsInput } from "../tags-input";
+import { FormField } from "@/components/shared/form-field";
+import { PublicSwitch, TagsInput } from "@/components/shared/note";
+import { validateNoteForm } from "@/utils/erros";
+
 import { useNotes } from "@/context";
 import { useToast } from "@/hooks/use-toast";
+
+import { Note } from "@/utils/types/note-types";
 
 type NoteFormProps = {
 	noteId?: string;
@@ -68,15 +70,7 @@ export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 	]);
 
 	const validateForm = useCallback((): boolean => {
-		const errors: typeof fieldErrors = {};
-
-		if (!title.trim()) {
-			errors.title = "Título é obrigatório";
-		}
-		if (!content.trim()) {
-			errors.content = "Conteúdo é obrigatório";
-		}
-
+		const errors = validateNoteForm({ title, content });
 		setFieldErrors(errors);
 
 		const firstError = Object.values(errors)[0];
@@ -116,8 +110,7 @@ export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 			<Card>
 				<CardContent>
 					<form onSubmit={onSubmit} ref={formRef} className="space-y-6">
-						<div className="space-y-2">
-							<Label htmlFor="title">Título *</Label>
+						<FormField label="Título *" id="title" error={fieldErrors.title}>
 							<Input
 								id="title"
 								name="title"
@@ -130,10 +123,13 @@ export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 										fieldErrors.title,
 								})}
 							/>
-						</div>
+						</FormField>
 
-						<div className="space-y-2">
-							<Label htmlFor="content">Conteúdo *</Label>
+						<FormField
+							label="Conteúdo *"
+							id="content"
+							error={fieldErrors.content}
+						>
 							<Textarea
 								id="content"
 								name="content"
@@ -147,7 +143,7 @@ export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 										fieldErrors.content,
 								})}
 							/>
-						</div>
+						</FormField>
 
 						<TagsInput value={tags} onChange={setTags} />
 						<PublicSwitch value={isPublic} onChange={setIsPublic} />
