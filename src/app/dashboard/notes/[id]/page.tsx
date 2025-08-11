@@ -3,11 +3,11 @@ import { NoteForm } from "@/components/shared/note";
 import { Note } from "@/utils/types/note-types";
 
 type EditNotePageProps = {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 };
 
 export default async function EditNotePage({ params }: EditNotePageProps) {
-	const { id } = params;
+	const { id } = await params;
 
 	let note: Note | null = null;
 
