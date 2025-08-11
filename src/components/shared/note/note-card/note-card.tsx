@@ -39,7 +39,7 @@ export function NoteCard({ note }: NoteCardProps) {
 						<CardTitle className="text-lg line-clamp-2">
 							<Link
 								prefetch
-								href={`/notes/${note.id}`}
+								href={`/dashboard/notes/${note.id}`}
 								className="hover:text-blue-600"
 							>
 								{note.title}
@@ -89,7 +89,7 @@ export function NoteCard({ note }: NoteCardProps) {
 									<Share2 className="h-3 w-3" />
 								</Button>
 							)}
-							<Link prefetch href={`/notes/${note.id}/edit`}>
+							<Link prefetch href={`/dashboard/notes/${note.id}`}>
 								<Button
 									variant="ghost"
 									size="sm"
