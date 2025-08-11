@@ -12,7 +12,11 @@ import React, {
 	useMemo,
 } from "react";
 import { useRouter } from "next/navigation";
-import { createNoteAction, deleteNoteAction } from "@/actions";
+import {
+	createNoteAction,
+	deleteNoteAction,
+	updateNoteAction,
+} from "@/actions";
 import { useToast } from "@/hooks/use-toast";
 
 import { NotesState } from "@/state/types/notes-state-type";
@@ -33,6 +37,11 @@ type NotesContextProps = {
 	) => Promise<void>;
 	handleDeleteNote: (id: string, onSuccess?: () => void) => Promise<void>;
 	handleClear: () => void;
+	handleUpdateNote: (
+		id: string,
+		formData: FormData,
+		onSuccess?: () => void
+	) => Promise<void>;
 	formRef: React.RefObject<HTMLFormElement | null>;
 	filteredNotes: Note[];
 } & NotesState;
@@ -182,6 +191,42 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 		}
 	}, []);
 
+	const handleUpdateNote = useCallback(
+		async (id: string, formData: FormData, onSuccess?: () => void) => {
+			dispatch({ type: "SET_PENDING", payload: true });
+			try {
+				const tagsString = formData.get("tags") as string;
+				const isPublic = formData.get("isPublic") === "true";
+				formData.set("tags", tagsString);
+				formData.set("isPublic", isPublic.toString());
+
+				const result = await updateNoteAction(id, formData);
+
+				if (result.success) {
+					toastSuccess("Nota atualizada com sucesso");
+					router.push("/dashboard");
+					if (onSuccess) onSuccess();
+				} else {
+					toastError("Não foi possível atualizar a nota", {
+						description: result.error || "Erro ao atualizar nota",
+					});
+					setError(result.error || "Erro ao atualizar nota");
+					if (onSuccess) onSuccess();
+				}
+			} catch (err) {
+				const message = (err as Error).message || "Erro inesperado";
+				toastError("Não foi possível atualizar a nota", {
+					description: message,
+				});
+				setError(message);
+				if (onSuccess) onSuccess();
+			} finally {
+				dispatch({ type: "SET_PENDING", payload: false });
+			}
+		},
+		[router, toastSuccess, toastError, setError]
+	);
+
 	return (
 		<NotesContext.Provider
 			value={{
@@ -200,6 +245,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 				handleCreateNote,
 				handleDeleteNote,
 				handleClear,
+				handleUpdateNote,
 			}}
 		>
 			{children}

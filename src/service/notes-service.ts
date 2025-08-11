@@ -159,7 +159,7 @@ async function getNoteById(id: string): Promise<Note | null> {
 			handleError(error, "buscar nota");
 		}
 
-		return data as Note;
+		return data ? (JSON.parse(JSON.stringify(data)) as Note) : null;
 	} catch (error) {
 		handleError(error as Error, "buscar nota");
 	}
