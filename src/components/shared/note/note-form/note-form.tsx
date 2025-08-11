@@ -1,57 +1,121 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useEffect, useState, useCallback } from "react";
 import { useFormStatus } from "react-dom";
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
+import Link from "next/link";
+import clsx from "clsx";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+import { Note } from "@/utils/types/note-types";
 import { PublicSwitch } from "../public-switch";
 import { TagsInput } from "../tags-input";
 import { useNotes } from "@/context";
+import { useToast } from "@/hooks/use-toast";
 
-export function NoteForm() {
+type NoteFormProps = {
+	noteId?: string;
+	initialNote?: Note | null;
+};
+
+export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 	const {
 		title,
-		formRef,
 		content,
 		tags,
 		isPublic,
+		formRef,
 		isClearButtonEnabled,
-		error,
 		setTitle,
 		setContent,
 		setTags,
 		setIsPublic,
 		handleCreateNote,
+		handleUpdateNote,
 		handleClear,
 	} = useNotes();
 
 	const { pending } = useFormStatus();
+	const { toastError } = useToast();
 
-	const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (!formRef.current) return;
-		const formData = new FormData(formRef.current);
-		await handleCreateNote(formData);
+	const [fieldErrors, setFieldErrors] = useState<{
+		title?: string;
+		content?: string;
+	}>({});
+
+	useEffect(() => {
+		if (noteId && initialNote) {
+			setTitle(initialNote.title);
+			setContent(initialNote.content);
+			setTags(initialNote.tags ?? []);
+			setIsPublic(initialNote.is_public);
+		} else {
+			handleClear();
+		}
+	}, [
+		noteId,
+		initialNote,
+		setTitle,
+		setContent,
+		setTags,
+		setIsPublic,
+		handleClear,
+	]);
+
+	const validateForm = useCallback((): boolean => {
+		const errors: typeof fieldErrors = {};
+
+		if (!title.trim()) {
+			errors.title = "Título é obrigatório";
+		}
+		if (!content.trim()) {
+			errors.content = "Conteúdo é obrigatório";
+		}
+
+		setFieldErrors(errors);
+
+		const firstError = Object.values(errors)[0];
+		if (firstError) {
+			toastError(firstError);
+			return false;
+		}
+
+		return true;
+	}, [title, content, toastError]);
+
+	const onSubmit = useCallback(
+		async (e: FormEvent<HTMLFormElement>) => {
+			e.preventDefault();
+			if (!formRef.current || !validateForm()) return;
+
+			const formData = new FormData(formRef.current);
+			formData.set("tags", tags.join(","));
+
+			if (noteId) {
+				await handleUpdateNote(noteId, formData);
+			} else {
+				await handleCreateNote(formData);
+			}
+		},
+		[formRef, noteId, validateForm, tags, handleUpdateNote, handleCreateNote]
+	);
+
+	const getSubmitLabel = () => {
+		if (pending)
+			return noteId ? "Atualizando anotação..." : "Salvando anotação...";
+		return noteId ? "Atualizar Anotação" : "Salvar Anotação";
 	};
 
 	return (
 		<div className="space-y-6">
 			<Card>
 				<CardContent>
-					{error && (
-						<Alert className="mb-4" variant="destructive">
-							<AlertDescription>{error}</AlertDescription>
-						</Alert>
-					)}
-
-					<form onSubmit={onSubmit} className="space-y-6" ref={formRef}>
+					<form onSubmit={onSubmit} ref={formRef} className="space-y-6">
 						<div className="space-y-2">
 							<Label htmlFor="title">Título *</Label>
 							<Input
@@ -61,6 +125,10 @@ export function NoteForm() {
 								required
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
+								className={clsx({
+									"border-red-500 focus-visible:ring-red-500":
+										fieldErrors.title,
+								})}
 							/>
 						</div>
 
@@ -74,37 +142,48 @@ export function NoteForm() {
 								required
 								value={content}
 								onChange={(e) => setContent(e.target.value)}
+								className={clsx({
+									"border-red-500 focus-visible:ring-red-500":
+										fieldErrors.content,
+								})}
 							/>
 						</div>
 
 						<TagsInput value={tags} onChange={setTags} />
-
 						<PublicSwitch value={isPublic} onChange={setIsPublic} />
 
 						<div className="flex items-center space-x-4 pt-4">
-							<Button disabled={pending} type="submit">
-								{pending ? (
-									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-										Salvando sua anotação, aguarde...
-									</>
-								) : (
-									"Salvar Anotação"
-								)}
-							</Button>
 							<Button
-								type="button"
-								variant="outline"
-								disabled={!isClearButtonEnabled}
-								onClick={handleClear}
-								className={
-									isClearButtonEnabled
-										? "hover:cursor-pointer"
-										: "hover:cursor-not-allowed"
-								}
+								disabled={pending}
+								type="submit"
+								className="hover:cursor-pointer"
 							>
-								Limpar
+								{pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+								{getSubmitLabel()}
 							</Button>
+
+							{noteId ? (
+								<Link prefetch href="/dashboard">
+									<Button
+										type="button"
+										variant="outline"
+										className="hover:cursor-pointer"
+									>
+										<ChevronLeft className="h-4 w-4" />
+										Voltar
+									</Button>
+								</Link>
+							) : (
+								<Button
+									type="button"
+									variant="outline"
+									className="hover:cursor-pointer"
+									disabled={!isClearButtonEnabled}
+									onClick={handleClear}
+								>
+									Limpar
+								</Button>
+							)}
 						</div>
 					</form>
 				</CardContent>
