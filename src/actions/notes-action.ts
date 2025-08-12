@@ -7,8 +7,9 @@ import {
 	updateNote,
 	deleteNote,
 	searchNotes,
+	getNoteById,
 } from "@/service/notes-service";
-import { SearchOptions } from "@/utils/types/note-types";
+import { Note, SearchOptions } from "@/utils/types/note-types";
 
 interface ActionResult {
 	success: boolean;
@@ -16,9 +17,15 @@ interface ActionResult {
 	data?: unknown;
 }
 
+type CreateNoteResponse = {
+	success: boolean;
+	data?: Note;
+	error?: string;
+};
+
 export async function createNoteAction(
 	formData: FormData
-): Promise<ActionResult> {
+): Promise<CreateNoteResponse> {
 	try {
 		const title = formData.get("title") as string;
 		const content = formData.get("content") as string;
@@ -44,7 +51,7 @@ export async function createNoteAction(
 
 		return {
 			success: true,
-			data: newNote,
+			data: { id: newNote.id, ...newNote },
 		};
 	} catch (error) {
 		return {
@@ -160,5 +167,29 @@ export async function searchNotesFormAction(formData: FormData): Promise<void> {
 				? error.message
 				: "Erro desconhecido ao pesquisar notas";
 		redirect(`/?error=${encodeURIComponent(errorMessage)}`);
+	}
+}
+
+export async function getNoteByIdAction(id: string): Promise<ActionResult> {
+	try {
+		if (!id) {
+			return { success: false, error: "ID da nota é obrigatório" };
+		}
+
+		const note = await getNoteById(id);
+
+		if (!note) {
+			return { success: false, error: "Nota não encontrada" };
+		}
+
+		return { success: true, data: note };
+	} catch (error) {
+		return {
+			success: false,
+			error:
+				error instanceof Error
+					? error.message
+					: "Erro desconhecido ao buscar nota",
+		};
 	}
 }
