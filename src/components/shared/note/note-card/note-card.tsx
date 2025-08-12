@@ -17,6 +17,8 @@ import { Calendar, Lock, Globe, Share2, Edit, Trash2 } from "lucide-react";
 import { Note } from "@/utils/types/note-types";
 import { formatDate } from "@/utils/date/format-date";
 import { useNotes } from "@/context";
+import { useToast } from "@/hooks/use-toast";
+import { generatePublicNoteLinkAction } from "@/actions/generate-public-note-link-action";
 
 type NoteCardProps = {
 	note: Note;
@@ -25,11 +27,23 @@ type NoteCardProps = {
 export function NoteCard({ note }: NoteCardProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { handleDeleteNote, isPending } = useNotes();
+	const { toastSuccess, toastError } = useToast();
 
 	const truncatedContent =
 		note.content.length > 150
 			? note.content.substring(0, 150) + "..."
 			: note.content;
+
+	const handleShare = async () => {
+		try {
+			const link = await generatePublicNoteLinkAction(note.id as string);
+			await navigator.clipboard.writeText(link);
+			toastSuccess("Link público copiado para a área de transferência!");
+		} catch (err) {
+			console.error(err);
+			toastError("Não foi possível gerar o link público.");
+		}
+	};
 
 	return (
 		<>
@@ -85,6 +99,7 @@ export function NoteCard({ note }: NoteCardProps) {
 									variant="ghost"
 									size="sm"
 									className="h-8 w-8 p-0 cursor-pointer"
+									onClick={handleShare}
 								>
 									<Share2 className="h-3 w-3" />
 								</Button>
