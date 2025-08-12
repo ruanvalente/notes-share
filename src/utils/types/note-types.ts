@@ -21,3 +21,16 @@ export type ErrorResponseOptions = {
 	message?: string;
 	error_description?: string;
 };
+
+export type PublicNote = {
+	id: string;
+	title: string;
+	content: string;
+	is_public: boolean;
+	tags: string[];
+	created_at: string;
+	updated_at: string;
+	user_id: string;
+	public_token: string;
+	public_token_expires_at: string;
+};

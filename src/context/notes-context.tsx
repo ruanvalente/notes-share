@@ -34,7 +34,7 @@ type NotesContextProps = {
 	handleCreateNote: (
 		formData: FormData,
 		onSuccess?: () => void
-	) => Promise<void>;
+	) => Promise<string | undefined>;
 	handleDeleteNote: (id: string, onSuccess?: () => void) => Promise<void>;
 	handleClear: () => void;
 	handleUpdateNote: (
@@ -126,7 +126,10 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 	);
 
 	const handleCreateNote = useCallback(
-		async (formData: FormData, onSuccess?: () => void) => {
+		async (
+			formData: FormData,
+			onSuccess?: () => void
+		): Promise<string | undefined> => {
 			dispatch({ type: "SET_PENDING", payload: true });
 			try {
 				formData.append("tags", state.tags.join(","));
@@ -134,21 +137,20 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
 				const result = await createNoteAction(formData);
 
-				if (result.success) {
+				if (result.success && result.data) {
 					toastSuccess("Nota criada com sucesso");
 					router.push("/dashboard");
 					if (onSuccess) onSuccess();
+					return result.data?.id;
 				} else {
 					toastError("Não foi possível criar a nota", {
 						description: result.error || "Erro ao criar nota",
 					});
-					if (onSuccess) onSuccess();
 				}
 			} catch (err) {
 				const message = (err as Error).message || "Erro inesperado";
 				toastError("Não foi possível criar a nota", { description: message });
 				setError(message);
-				if (onSuccess) onSuccess();
 			} finally {
 				dispatch({ type: "SET_PENDING", payload: false });
 			}
