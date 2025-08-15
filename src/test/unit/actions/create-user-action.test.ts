@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createUserAction } from "@/actions/create-user-action";
-import { CREATE_USER_ERROR_MESSAGES } from "@/utils/constants/messages";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import * as validations from "@/utils/validations";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createUserAction } from "@/actions/create-user-action";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { CREATE_USER_ERROR_MESSAGES } from "@/utils/constants/messages";
+import * as validations from "@/utils/validations";
 
 vi.mock("@/lib/supabase/server", () => ({
 	createSupabaseServerClient: vi.fn(),
@@ -38,7 +40,7 @@ describe("createUserAction", () => {
 		vi.clearAllMocks();
 
 		vi.mocked(createSupabaseServerClient).mockResolvedValue(
-			mockSupabase as any
+			mockSupabase as unknown as SupabaseClient
 		);
 
 		vi.spyOn(validations, "checkIsValidEmail").mockReturnValue(true);
