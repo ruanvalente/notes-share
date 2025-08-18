@@ -127,11 +127,11 @@ export function createHandleUpdateNote(
 
 export function createHandleClear(
 	dispatch: ActionDispatch,
-	formRef: React.RefObject<HTMLFormElement | null>
+	formRef?: React.RefObject<HTMLFormElement | null>
 ) {
 	return () => {
 		dispatch({ type: "CLEAR" });
-		if (formRef.current) {
+		if (formRef?.current) {
 			formRef.current.reset();
 		}
 	};
