@@ -12,9 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { useNotes } from "@/context";
-
 import { Note } from "@/utils/types/note-types";
+import { useNotes } from "@/context";
 
 type ClientDashboardTypeProps = {
 	notes: Note[];
