@@ -15,10 +15,10 @@ import { FormField } from "@/components/shared/form-field";
 import { PublicSwitch, TagsInput } from "@/components/shared/note";
 import { validateNoteForm } from "@/utils/erros";
 
-import { useNotes } from "@/context";
 import { useToast } from "@/hooks/use-toast";
 
 import { Note } from "@/utils/types/note-types";
+import { useNotes } from "@/context";
 
 type NoteFormProps = {
 	noteId?: string;
