@@ -1,96 +1,77 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 
-interface TagsInputProps {
+type TagsInputProps = {
 	value?: string[];
-	defaultTags?: string[];
+	defaultValue?: string[];
 	onChange?: (tags: string[]) => void;
-}
+};
 
 export function TagsInput({
-	value = [],
-	defaultTags = [],
+	value,
+	defaultValue = [],
 	onChange,
 }: TagsInputProps) {
-	const [tags, setTags] = useState<string[]>(
-		value.length > 0 ? value : defaultTags
-	);
-	const [newTag, setNewTag] = useState("");
+	const [tags, setTags] = useState(value ?? defaultValue);
+	const [input, setInput] = useState("");
 
 	useEffect(() => {
-		setTags(value);
+		if (value !== undefined) setTags(value);
 	}, [value]);
 
 	const handleAddTag = () => {
-		const trimmedTag = newTag.trim();
-		if (trimmedTag && !tags.includes(trimmedTag)) {
-			const updated = [...tags, trimmedTag];
+		const newTag = input.trim();
+		if (newTag && !tags.includes(newTag)) {
+			const updated = [...tags, newTag];
 			setTags(updated);
 			onChange?.(updated);
-			setNewTag("");
 		}
+		setInput("");
 	};
 
 	const handleRemoveTag = (tagToRemove: string) => {
-		const updated = tags.filter((tag) => tag !== tagToRemove);
+		const updated = tags.filter((t) => t !== tagToRemove);
 		setTags(updated);
 		onChange?.(updated);
 	};
 
-	const isAddButtonDisabled = newTag.trim() === "";
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			handleAddTag();
+		}
+	};
 
 	return (
 		<div className="space-y-2">
-			<Label>Tags</Label>
-			<div className="flex space-x-2">
-				<Input
-					placeholder="Adicionar tag..."
-					value={newTag}
-					onChange={(e) => setNewTag(e.target.value)}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") {
-							e.preventDefault();
-							handleAddTag();
-						}
-					}}
-				/>
-				<Button
-					type="button"
-					onClick={handleAddTag}
-					variant="outline"
-					disabled={isAddButtonDisabled}
-					className={isAddButtonDisabled ? "cursor-not-allowed" : ""}
-				>
-					<Plus className="h-4 w-4" />
-				</Button>
-			</div>
+			<input
+				type="text"
+				placeholder="Adicionar tag..."
+				value={input}
+				onChange={(e) => setInput(e.target.value)}
+				onKeyDown={handleKeyDown}
+				className="border px-2 py-1 rounded w-full"
+			/>
+			<div className="flex flex-wrap gap-2">
+				{tags.map((tag) => (
+					<span
+						key={tag}
+						className="bg-gray-200 px-2 py-1 rounded flex items-center gap-1"
+					>
+						{tag}
 
-			{tags.length > 0 && (
-				<div className="flex flex-wrap gap-2 mt-2">
-					{tags.map((tag) => (
-						<Badge
-							key={tag}
-							variant="secondary"
-							className="flex items-center space-x-1"
+						<div
+							aria-label="Remover tag"
+							className="text-zinc-900 hover:cursor-pointer"
+							onClick={() => handleRemoveTag(tag)}
 						>
-							<span>{tag}</span>
-							<button
-								type="button"
-								onClick={() => handleRemoveTag(tag)}
-								className="ml-1 hover:text-red-600"
-							>
-								<X className="h-3 w-3" />
-							</button>
-						</Badge>
-					))}
-				</div>
-			)}
+							<X className="h-4 w-4" />
+						</div>
+					</span>
+				))}
+			</div>
 		</div>
 	);
 }
