@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { useFormStatus } from "react-dom";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
@@ -16,7 +15,6 @@ import { PublicSwitch, TagsInput } from "@/components/shared/note";
 import { validateNoteForm } from "@/utils/erros";
 
 import { useToast } from "@/hooks/use-toast";
-
 import { Note } from "@/utils/types/note-types";
 import { useNotes } from "@/context";
 
@@ -26,29 +24,18 @@ type NoteFormProps = {
 };
 
 export function NoteForm({ noteId, initialNote }: NoteFormProps) {
-	const {
-		title,
-		content,
-		tags,
-		isPublic,
-		formRef,
-		isClearButtonEnabled,
-		setTitle,
-		setContent,
-		setTags,
-		setIsPublic,
-		handleCreateNote,
-		handleUpdateNote,
-		handleClear,
-	} = useNotes();
-
-	const { pending } = useFormStatus();
+	const { handleCreateNote, handleUpdateNote } = useNotes();
 	const { toastError } = useToast();
 
+	const [title, setTitle] = useState("");
+	const [content, setContent] = useState("");
+	const [tags, setTags] = useState<string[]>([]);
+	const [isPublic, setIsPublic] = useState(false);
 	const [fieldErrors, setFieldErrors] = useState<{
 		title?: string;
 		content?: string;
 	}>({});
+	const [isPending, setIsPending] = useState(false);
 
 	useEffect(() => {
 		if (noteId && initialNote) {
@@ -57,17 +44,13 @@ export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 			setTags(initialNote.tags ?? []);
 			setIsPublic(initialNote.is_public);
 		} else {
-			handleClear();
+			setTitle("");
+			setContent("");
+			setTags([]);
+			setIsPublic(false);
+			setFieldErrors({});
 		}
-	}, [
-		noteId,
-		initialNote,
-		setTitle,
-		setContent,
-		setTags,
-		setIsPublic,
-		handleClear,
-	]);
+	}, [noteId, initialNote]);
 
 	const validateForm = useCallback((): boolean => {
 		const errors = validateNoteForm({ title, content });
@@ -85,31 +68,58 @@ export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 	const onSubmit = useCallback(
 		async (e: FormEvent<HTMLFormElement>) => {
 			e.preventDefault();
-			if (!formRef.current || !validateForm()) return;
+			if (!validateForm()) return;
 
-			const formData = new FormData(formRef.current);
+			const formData = new FormData();
+			formData.set("title", title);
+			formData.set("content", content);
 			formData.set("tags", tags.join(","));
+			formData.set("isPublic", isPublic.toString());
 
-			if (noteId) {
-				await handleUpdateNote(noteId, formData);
-			} else {
-				await handleCreateNote(formData);
+			setIsPending(true);
+			try {
+				if (noteId) {
+					await handleUpdateNote(noteId, formData);
+				} else {
+					await handleCreateNote(formData);
+				}
+			} finally {
+				setIsPending(false);
 			}
 		},
-		[formRef, noteId, validateForm, tags, handleUpdateNote, handleCreateNote]
+		[
+			title,
+			content,
+			tags,
+			isPublic,
+			noteId,
+			handleCreateNote,
+			handleUpdateNote,
+			validateForm,
+		]
 	);
 
-	const getSubmitLabel = () => {
-		if (pending)
-			return noteId ? "Atualizando anotação..." : "Salvando anotação...";
+	const getSubmitLabel = useCallback(() => {
+		if (isPending) return noteId ? "Atualizando..." : "Salvando...";
 		return noteId ? "Atualizar Anotação" : "Salvar Anotação";
+	}, [isPending, noteId]);
+
+	const isClearButtonEnabled =
+		title.trim() !== "" || content.trim() !== "" || tags.length > 0;
+
+	const handleClear = () => {
+		setTitle("");
+		setContent("");
+		setTags([]);
+		setIsPublic(false);
+		setFieldErrors({});
 	};
 
 	return (
 		<div className="space-y-6">
 			<Card>
 				<CardContent>
-					<form onSubmit={onSubmit} ref={formRef} className="space-y-6">
+					<form onSubmit={onSubmit} className="space-y-6">
 						<FormField label="Título *" id="title" error={fieldErrors.title}>
 							<Input
 								id="title"
@@ -150,11 +160,11 @@ export function NoteForm({ noteId, initialNote }: NoteFormProps) {
 
 						<div className="flex items-center space-x-4 pt-4">
 							<Button
-								disabled={pending}
+								disabled={isPending}
 								type="submit"
 								className="hover:cursor-pointer"
 							>
-								{pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+								{isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 								{getSubmitLabel()}
 							</Button>
 
