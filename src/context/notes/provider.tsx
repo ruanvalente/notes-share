@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useReducer, useRef, useCallback } from "react";
+import React, { useReducer, useRef, useCallback, useMemo } from "react";
 import { notesReducer } from "@/state";
 import { useRouter } from "next/navigation";
 import { Note } from "@/utils/types/note-types";
@@ -57,15 +57,22 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
 		[]
 	);
 
-	const handleCreateNote = createHandleCreateNote(
-		dispatch,
-		state,
-		router,
-		setError
+	const handleCreateNote = useMemo(
+		() => createHandleCreateNote(dispatch, state, router, setError),
+		[dispatch, state, router, setError]
 	);
-	const handleDeleteNote = createHandleDeleteNote(dispatch, router, setError);
-	const handleUpdateNote = createHandleUpdateNote(dispatch, router, setError);
-	const handleClear = createHandleClear(dispatch, formRef);
+	const handleDeleteNote = useMemo(
+		() => createHandleDeleteNote(dispatch, router, setError),
+		[dispatch, router, setError]
+	);
+	const handleUpdateNote = useMemo(
+		() => createHandleUpdateNote(dispatch, router, setError),
+		[dispatch, router, setError]
+	);
+	const handleClear = useMemo(
+		() => createHandleClear(dispatch, formRef),
+		[dispatch, formRef]
+	);
 
 	return (
 		<NotesContext.Provider
